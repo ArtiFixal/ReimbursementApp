@@ -1,0 +1,63 @@
+*{
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+#allowanceBlock,#mileageBlock{
+	display: none;
+}
+.show{
+	display: block!important;
+}
+
+#allowanceExcludeBlock,.yearBody,.monthBody{
+	display: flex;
+	flex-wrap: wrap;
+}
+.yearBlock,.monthBlock{
+	width: 50%;
+	min-width: 200px;
+}
+.yearBlock{
+	border: 1px solid;
+	border-right: 0;
+	border-bottom: 0;
+}
+.yearBlock:nth-of-type(n+1){
+	border-right: 1px solid;
+}
+.yearHeader{
+	border-bottom: 1px solid black;
+	padding: 5px 0;
+	text-align: center;
+}
+.monthBlock{
+	text-align: center;
+	border-bottom: 1px solid;
+	border-right: 1px solid;
+	border-top: 0;
+}
+.monthBlock:nth-of-type(2n)
+{
+	border-right: 0;
+}
+.monthBody{
+	padding: 6px;
+}
+.monthHeader{
+	border-bottom: 1px solid;
+	text-align: center
+}
+.dayBlock{
+	margin: 2px;
+	width: 20px;
+	height: 20px;
+	user-select: none;
+}
+.dayLabel input{
+	display: none;
+}
+
+input:checked+.dayBlock{
+	background: wheat;
+}

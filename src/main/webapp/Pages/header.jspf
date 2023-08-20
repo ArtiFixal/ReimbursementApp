@@ -1,0 +1,6 @@
+<header>
+	<c:if test="${sessionScope.userName!=null}">
+		User: <c:out value="${sessionScope.userName}"></c:out>
+	</c:if>
+	<a href="../index.html">Logout</a>
+</header>
