@@ -56,7 +56,7 @@ public class DBConfig {
 		{
 			try{
 				config=new DBConfig();
-			}catch(FileNotFoundException|NullPointerException e){
+			}catch(FileNotFoundException e){
 				// Create example config
 				synchronized(DB_CONFIG){
 					String configBuilder="<dbURL>127.0.0.1:3306\n<dbName>reibursements\n<dbUser>root\n<dbPass>\n";

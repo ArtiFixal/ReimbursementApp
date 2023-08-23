@@ -33,7 +33,7 @@ public class ConfigIO {
 	 * @throws OptionNotFoundException If searched option wasn't found in file.
 	 */
 	public String readOptionValue(String option) throws FileNotFoundException, 
-			IOException, NullPointerException, OptionNotFoundException {
+			IOException, OptionNotFoundException {
 		try(FileReader r=new FileReader(config);BufferedReader br=new BufferedReader(r,512)){
 			String line;
 			while((line=br.readLine())!=null)

@@ -38,7 +38,7 @@ public class TestConfig {
 		{
 			try{
 				config=new TestConfig();
-			}catch(FileNotFoundException|NullPointerException e){
+			}catch(FileNotFoundException e){
 				// Create example config
 				synchronized(TEST_CONFIG){
 					String configBuilder=
