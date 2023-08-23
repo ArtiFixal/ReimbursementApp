@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 /**
  * Class responsible for handling days excluded from the claim calculation.
@@ -82,6 +83,31 @@ public class ExcludedDays {
 				getLocalDateFromNode(mapper,toNode));
 	}
 	
+	private static Comparator<LocalDate> createAscLocalDateComparator()
+	{
+		return new Comparator<LocalDate>() {
+			@Override
+			public int compare(LocalDate o1,LocalDate o2){
+				return o1.compareTo(o2);
+			}
+		};
+	}
+	
+	private static Comparator<Period> createAscPeriodComparator()
+	{
+		return new Comparator<Period>() {
+			@Override
+			public int compare(Period o1,Period o2){
+				int result=o1.getDateFrom().compareTo(o2.getDateFrom());
+				if(result==0)
+				{
+					return o1.getDateTo().compareTo(o2.getDateTo());
+				}
+				return result;
+			}
+		};
+	}
+	
 	/**
 	 * Reads {@code ExcludedDays} object from given {@code JsonNode}.
 	 * 
@@ -97,53 +123,64 @@ public class ExcludedDays {
 			IllegalArgumentException{
 		final JsonNode daysNode=node.get("days");
 		final JsonNode periodNode=node.get("periods");
-		final ExcludedDays ed=new ExcludedDays();
+		final ExcludedDays excluded=new ExcludedDays();
 		final ObjectMapper mapper=new ObjectMapper()
 				.registerModule(new JavaTimeModule());
 		// Check for days existence
 		if(daysNode!=null&&!(daysNode instanceof NullNode))
 		{
-			int i=1;
-			JsonNode el=daysNode.get(0);
-			if(el!=null)
+			int i=0;
+			JsonNode nextNode;
+			while((nextNode=daysNode.get(i))!=null)
 			{
-				LocalDate previousDate=getLocalDateFromNode(mapper,el);
-				ed.addDay(previousDate);
-				while((el=daysNode.get(i))!=null)
-				{
-					LocalDate current=getLocalDateFromNode(mapper,el);
-					if(previousDate.equals(current))
-						throw new ExcludedDaysException("Duplicated days were found");
-					else if(previousDate.until(current).
-							equals(java.time.Period.ofDays(1)))
-						throw new ExcludedDaysException("Days are ascending instead of being a period");
-					ed.addDay(current);
-					previousDate=current;
-					i++;
-				}
+				excluded.addDay(getLocalDateFromNode(mapper,nextNode));
+				i++;
+			}
+			excluded.getDays().sort(createAscLocalDateComparator());
+			LocalDate previousDate=excluded.getDays().get(0);
+			for(int j=1;j<excluded.getDays().size();j++)
+			{
+				LocalDate current=excluded.getDays().get(j);
+				if(previousDate.equals(current))
+					throw new ExcludedDaysException("Duplicated days were found");
+				else if(Period.getNumberOfDaysPassed(current
+						,previousDate)==1)
+					throw new ExcludedDaysException("Days are increasing in order instead of being a period");
+				previousDate=current;
 			}
 		}
 		// Check for periods existence
 		if(periodNode!=null&&!(daysNode instanceof NullNode))
 		{
-			int i=1;
-			JsonNode el=periodNode.get(0);
-			if(el!=null)
+			int i=0;
+			JsonNode nextNode=periodNode.get(0);
+			if(nextNode!=null)
 			{
-				Period previous=getPeriodFromNode(mapper,el);
-				ed.addPeriod(previous);
-				while((el=periodNode.get(i))!=null)
+				while((nextNode=periodNode.get(i))!=null)
 				{
-					Period current=getPeriodFromNode(mapper,el);
+					Period current=getPeriodFromNode(mapper,nextNode);
+					int compareResult=current.getDateFrom().compareTo(current.getDateTo());
+					if(compareResult>0)
+						throw new ExcludedDaysException("Period dateFrom is after dateTo");
+					else if(compareResult==0)
+						throw new ExcludedDaysException("Period dateFrom and dateTo are the same day - Period should be a day instead");
+					excluded.addPeriod(current);
+					i++;
+				}
+				excluded.getPeriods().sort(createAscPeriodComparator());
+				Period previous=excluded.getPeriods().get(0);
+				for(int j=1;j<excluded.getPeriods().size();j++)
+				{
+					Period current=excluded.getPeriods().get(j);
 					if(previous.equals(current))
 						throw new ExcludedDaysException("Duplicated periods were found");
-					ed.addPeriod(current);
+					else if(Period.getNumberOfDaysPassed(previous.getDateTo(),current.getDateFrom())==1)
+						throw new ExcludedDaysException("Periods follow each other instead of being a single one");
 					previous=current;
-					i++;
 				}
 			}
 		}
-		return ed;
+		return excluded;
 	}
 	
 	/**
