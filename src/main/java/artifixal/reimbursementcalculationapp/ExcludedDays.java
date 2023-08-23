@@ -123,8 +123,6 @@ public class ExcludedDays {
 				}
 			}
 		}
-		else if(daysNode instanceof NullNode)
-			throw new ExcludedDaysException("Days node is null");
 		// Check for periods existence
 		if(periodNode!=null&&!(daysNode instanceof NullNode))
 		{
@@ -145,8 +143,6 @@ public class ExcludedDays {
 				}
 			}
 		}
-		else if(periodNode instanceof NullNode)
-			throw new ExcludedDaysException("Period node is null");
 		return ed;
 	}
 	

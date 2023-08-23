@@ -236,6 +236,16 @@ function collectExcludedDays()
 				days.periods.push(data);
 		}
 	}
+        if(data.days.length===0&&data.periods.length===0)
+        {
+            delete data.days;
+            delete data.periods;
+            return null;
+        }
+        if(data.days.length===0)
+            delete data.days;
+        else
+            delete data.periods;
 	return days;
 }
 
@@ -258,7 +268,9 @@ function prepareData(){
 	const data={"dateFrom":dateFrom,"dateTo":dateTo,receipts:collectReceipts()};
 	if(document.getElementsByName("includeDailyAllowance")[0].checked)
 	{
-		data.excluded=collectExcludedDays();
+		const excludedDays=collectExcludedDays();
+		if(excludedDays!==null)
+			data.excluded=excludedDays;
 	}
 	if(document.getElementsByName("includeCarMileage")[0].checked)
 	{
