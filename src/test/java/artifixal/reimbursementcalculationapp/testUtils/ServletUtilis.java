@@ -7,14 +7,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- *
+ * Utility class containing usefull methods used to test servlets.
+ * 
  * @author ArtiFixal
  */
 public class ServletUtilis {
 	public final static String JSON_CONTENT="application/json";
 	
 	private ServletUtilis(){
-		throw new AssertionError("Not instantable");
+		throw new AssertionError("Not instantiable");
 	}
 	
 	public static HttpURLConnection createHttpConnection(String url,String method,

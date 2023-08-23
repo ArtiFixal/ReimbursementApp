@@ -4,7 +4,8 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 /**
- *
+ * Class representing DB claim record.
+ * 
  * @author ArtiFixal
  */
 public class Claim {

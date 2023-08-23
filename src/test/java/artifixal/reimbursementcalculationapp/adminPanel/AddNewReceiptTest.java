@@ -12,7 +12,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 /**
- *
+ * Tests related to {@link AddNewReceipt} {@code Servlet} functionality.
+ * 
  * @author ArtiFixal
  */
 public class AddNewReceiptTest {

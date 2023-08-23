@@ -13,7 +13,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- *
+ * Servlet responsible for processing update requests related to limits.
+ * (Total reimbursement limit and Max distance)<p>
+ * 
+ * A valid request must be a JSON object with given structure:<br>
+ * {<br>
+ *	"id": <i>limit to update</i><br>
+ *	"amount": <i>new amount</i><br>
+ * }<br>
+ * 
  * @author ArtiFixal
  */
 @WebServlet(name="UpdateLimit", urlPatterns={"/updateLimit"})
@@ -21,8 +29,10 @@ public class UpdateLimit extends HttpServlet {
 	
     /** 
      * Handles the HTTP <code>POST</code> method.
+	 * 
      * @param request servlet request
      * @param response servlet response
+	 * 
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
@@ -85,11 +95,11 @@ public class UpdateLimit extends HttpServlet {
 
     /** 
      * Returns a short description of the servlet.
+	 * 
      * @return a String containing servlet description
      */
     @Override
     public String getServletInfo() {
-        return "Updates limit data";
-    }// </editor-fold>
-
+        return "Updates limit data in DB";
+    }
 }

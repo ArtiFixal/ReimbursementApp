@@ -12,7 +12,16 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 /**
- *
+ * Class responsible for operations on <b>types</b> DB table. <p>
+ * 
+ * Types table have the given structure: <br>
+ * 
+ * types( <br>
+ *	id INT UNSIGNED <b>AI PK</b>, <br>
+ *	`limit` DECIMAL(12,2) UNSIGNED NOT NULL, <br>
+ *	name VARCHAR(50) NOT NULL <br>
+ * ) 
+ * 
  * @author ArtiFixal
  */
 public class ReceiptTypeDAO implements AutoCloseable{
@@ -27,7 +36,17 @@ public class ReceiptTypeDAO implements AutoCloseable{
 		this.con=con;
 	}
 	
-	public ReceiptType getReceiptById(long id,boolean includeLimit) throws SQLException
+	/**
+	 * Selects single {@code ReceiptType} record from DB table.
+	 * 
+	 * @param id ID by which we want to select {@code ReceiptType} record.
+	 * @param includeLimit Should limit be included into query?
+	 * 
+	 * @return Selected receipt type.
+	 * @throws SQLException Any error occurred during the query.
+	 * @see ReceiptType
+	 */
+	public ReceiptType getReceiptTypeById(long id,boolean includeLimit) throws SQLException
 	{
 		Statement selectReceipt=con.createStatement();
 		ResultSet result;
@@ -52,7 +71,7 @@ public class ReceiptTypeDAO implements AutoCloseable{
 	 * @param r ReceiptType to be inserted.
 	 * 
 	 * @return Inserted ID or -1 if receipt already exists.
-	 * @throws SQLException 
+	 * @throws SQLException Any error occurred during the DML query.
 	 */
 	public long createReceipt(ReceiptType r) throws SQLException
 	{
@@ -82,7 +101,8 @@ public class ReceiptTypeDAO implements AutoCloseable{
 	 * @param result Result of an SQL Querry.
 	 * 
 	 * @return All available receipts.
-	 * @throws SQLException 
+	 * @throws SQLException Any error occurred during the query.
+	 * @see ReceiptType
 	 */
 	private ArrayList<ReceiptType> makeReceiptsArray(ResultSet result) throws SQLException
 	{
@@ -106,7 +126,8 @@ public class ReceiptTypeDAO implements AutoCloseable{
 	 * Retrieves all {@code ReceiptType} types from DB.
 	 * 
 	 * @return All available receipts.
-	 * @throws SQLException 
+	 * @throws SQLException Any error occurred during the query.
+	 * @see ReceiptType
 	 */
 	public ArrayList<ReceiptType> getAllReceipts() throws SQLException
 	{
@@ -119,7 +140,8 @@ public class ReceiptTypeDAO implements AutoCloseable{
 	 * Retrieves all {@code ReceiptType} types from DB without <b>limit</b> column.
 	 * 
 	 * @return All available receipts without limit column.
-	 * @throws SQLException 
+	 * @throws SQLException Any error occurred during the query.
+	 * @see ReceiptType
 	 */
 	public ArrayList<ReceiptType> getAllReceiptsMinimal() throws SQLException
 	{
@@ -129,15 +151,20 @@ public class ReceiptTypeDAO implements AutoCloseable{
 	}
 	
 	/**
+	 * Updates {@code ReceiptType} columns by its ID. <p>
 	 * 
-	 * @param id
-	 * @param newName
-	 * @param newLimit
+	 * This method allows to update both name and limit at the same time or only
+	 * one of them.
 	 * 
-	 * @return
-	 * @throws SQLException 
+	 * @param id ID of which {@code ReceiptType} to update
+	 * @param newName If we want to update name
+	 * @param newLimit If we want to update limit
+	 * 
+	 * @return True if update was successful, false otherwise.
+	 * @throws SQLException Any error occurred during the DML query.
 	 */
-	public boolean updateReceipt(long id,Optional<String> newName,Optional<BigDecimal> newLimit) throws SQLException
+	public boolean updateReceipt(long id,Optional<String> newName,
+			Optional<BigDecimal> newLimit) throws SQLException
 	{
 		StringBuilder sqlQuery=new StringBuilder("UPDATE types SET ");
 		if(newName.isPresent()&&newLimit.isPresent())
@@ -164,17 +191,33 @@ public class ReceiptTypeDAO implements AutoCloseable{
 		return result==1;
 	}
 	
-	public boolean updateReceipt(ReceiptType r,Optional<String> newName,Optional<BigDecimal> newLimit) throws SQLException
+	/**
+	 * Updates {@code ReceiptType} columns for given {@code ReceiptType} object
+	 * in DB. <p>
+	 * 
+	 * This method allows to update both name and limit at the same time or only
+	 * one of them.
+	 * 
+	 * @param r Object which we want to update
+	 * @param newName If we want to update name
+	 * @param newLimit If we want to update limit
+	 * 
+	 * @return True if update was successful, false otherwise.
+	 * @throws SQLException Any error occurred during the DML query.
+	 */
+	public boolean updateReceipt(ReceiptType r,Optional<String> newName,
+			Optional<BigDecimal> newLimit) throws SQLException
 	{
 		return updateReceipt(r.getId(),newName,newLimit);
 	}
 	
 	/**
 	 * Deletes {@code ReceiptType} from DB by given ID.
+	 * 
 	 * @param id ID of receipt to delete;
 	 * 
 	 * @return True if receipt was deleted, false otherwise.
-	 * @throws SQLException 
+	 * @throws SQLException Any error occurred during the DML query.
 	 */
 	public boolean deleteReceipt(long id) throws SQLException
 	{
@@ -187,10 +230,11 @@ public class ReceiptTypeDAO implements AutoCloseable{
 	
 	/**
 	 * Deletes given {@ code ReceiptType} from DB.
+	 * 
 	 * @param r ReceiptType to delete;
 	 * 
 	 * @return True if receipt was deleted, false otherwise.
-	 * @throws SQLException 
+	 * @throws SQLException Any error occurred during the DML query.
 	 */
 	public boolean deleteReceipt(ReceiptType r) throws SQLException{
 		return deleteReceipt(r.getId());
@@ -199,7 +243,7 @@ public class ReceiptTypeDAO implements AutoCloseable{
 	/**
 	 * Closes connection with DB.
 	 * 
-	 * @throws SQLException 
+	 * @throws SQLException Any error occured during connection close try.
 	 */
 	@Override
 	public void close() throws SQLException {

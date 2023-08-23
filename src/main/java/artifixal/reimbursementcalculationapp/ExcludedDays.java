@@ -8,11 +8,19 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 /**
- *
+ * Class responsible for handling days excluded from the claim calculation.
+ * 
  * @author ArtiFixal
  */
 public class ExcludedDays {
+	/**
+	 * Single days excluded from the claim.
+	 */
 	private final ArrayList<LocalDate> days;
+	
+	/**
+	 * Periods excluded from the claim.
+	 */
 	private final ArrayList<Period> periods;
 
 	public ExcludedDays() {
@@ -36,12 +44,35 @@ public class ExcludedDays {
 		periods.add(p);
 	}
 	
+	/**
+	 * Converts date from JSON object request node into {@code LocalDate}.
+	 * 
+	 * @param mapper Referene to the mapper.
+	 * @param node Node containing date to convert.
+	 * 
+	 * @return Converted date.
+	 * 
+	 * @throws IllegalArgumentException If its impossible to the convert date 
+	 * into {@code LocalDate}.
+	 * @see LocalDate
+	 */
 	private static LocalDate getLocalDateFromNode(ObjectMapper mapper,JsonNode node)
 			throws IllegalArgumentException
 	{
 		return mapper.convertValue(node,LocalDate.class);
 	}
 	
+	/**
+	 * Converts period from JSON object request into {@link Period}.
+	 * 
+	 * @param mapper Referene to the mapper.
+	 * @param node Node containing period to convert.
+	 * 
+	 * @return Converted period.
+	 * 
+	 * @throws IllegalArgumentException If its impossible to convert JSON period
+	 * into {@code Period}.
+	 */
 	private static Period getPeriodFromNode(ObjectMapper mapper,JsonNode node) 
 			throws IllegalArgumentException
 	{
@@ -51,12 +82,25 @@ public class ExcludedDays {
 				getLocalDateFromNode(mapper,toNode));
 	}
 	
-	public static ExcludedDays readFrom(JsonNode json) throws ExcludedDaysException,
+	/**
+	 * Reads {@code ExcludedDays} object from given {@code JsonNode}.
+	 * 
+	 * @param node From which to read.
+	 * 
+	 * @return ExcludedDays object.
+	 * 
+	 * @throws ExcludedDaysException If any syntax error is present.
+	 * @throws IllegalArgumentException If any date isn't convertable into 
+	 * {@code LodalDate}
+	 */
+	public static ExcludedDays readFrom(JsonNode node) throws ExcludedDaysException,
 			IllegalArgumentException{
-		final JsonNode daysNode=json.get("days");
-		final JsonNode periodNode=json.get("periods");
+		final JsonNode daysNode=node.get("days");
+		final JsonNode periodNode=node.get("periods");
 		final ExcludedDays ed=new ExcludedDays();
-		final ObjectMapper mapper=new ObjectMapper().registerModule(new JavaTimeModule());
+		final ObjectMapper mapper=new ObjectMapper()
+				.registerModule(new JavaTimeModule());
+		// Check for days existence
 		if(daysNode!=null&&!(daysNode instanceof NullNode))
 		{
 			int i=1;
@@ -69,7 +113,7 @@ public class ExcludedDays {
 				{
 					LocalDate current=getLocalDateFromNode(mapper,el);
 					if(previousDate.equals(current))
-						throw new ExcludedDaysException("Duplicated days was found");
+						throw new ExcludedDaysException("Duplicated days were found");
 					else if(previousDate.until(current).
 							equals(java.time.Period.ofDays(1)))
 						throw new ExcludedDaysException("Days are ascending instead of being a period");
@@ -81,6 +125,7 @@ public class ExcludedDays {
 		}
 		else if(daysNode instanceof NullNode)
 			throw new ExcludedDaysException("Days node is null");
+		// Check for periods existence
 		if(periodNode!=null&&!(daysNode instanceof NullNode))
 		{
 			int i=1;
@@ -93,7 +138,7 @@ public class ExcludedDays {
 				{
 					Period current=getPeriodFromNode(mapper,el);
 					if(previous.equals(current))
-						throw new ExcludedDaysException("Duplicated periods was found");
+						throw new ExcludedDaysException("Duplicated periods were found");
 					ed.addPeriod(current);
 					previous=current;
 					i++;
@@ -105,6 +150,11 @@ public class ExcludedDays {
 		return ed;
 	}
 	
+	/**
+	 * Converts this object into JSON object.
+	 * 
+	 * @return JSON object valid to insert into DB.
+	 */
 	public String toJson()
 	{
 		final StringBuilder json=new StringBuilder("{");

@@ -4,7 +4,8 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 /**
- *
+ * Class representing date periods logic.
+ * 
  * @author ArtiFixal
  */
 public class Period {
@@ -43,6 +44,11 @@ public class Period {
 		return hash;
 	}
 	
+	/**
+	 * Converts period into JSON object.
+	 * 
+	 * @return Converted JSON object;
+	 */
 	public String toJson()
 	{
 		return "{\"from\":\""+dateFrom.toString()+"\",\"to\":\""+dateTo.toString()+"\"}";

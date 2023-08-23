@@ -30,7 +30,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- *
+ * Servlet responsible for processing user requests to calculate total amount of
+ * reimbursement claim. <p>
+ * 
+ * Valid request must be a JSON object with given structure: <br>
+ * { <br>
+ *	"dateFrom": <i> trip start date </i><br>
+ *	"dateTo": <i> trip end date </i><br>
+ *	"receipts": <i> receipts declared by user </i> <b>*Optional* [{array of 
+ * objects}]</b><br>
+ *	"excluded": <i> days excluded from daily allowance </i> <b>*Optional* 
+ * [{array of objects}]</b><br>
+ *	"mileage": <i>distance for which personal car was used </i> <b>*Optional*</b><br>
+ * }
+ * 
  * @author ArtiFixal
  */
 @WebServlet(name="CalculateClaim", urlPatterns={"/calculateClaim"})
@@ -38,8 +51,10 @@ public class CalculateClaim extends HttpServlet {
 
     /** 
      * Handles the HTTP <code>POST</code> method.
+	 * 
      * @param request servlet request
      * @param response servlet response
+	 * 
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
@@ -193,11 +208,11 @@ public class CalculateClaim extends HttpServlet {
 
     /** 
      * Returns a short description of the servlet.
+	 * 
      * @return a String containing servlet description
      */
     @Override
     public String getServletInfo() {
         return "Calculates claim value";
-    }// </editor-fold>
-
+    }
 }

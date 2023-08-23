@@ -16,20 +16,28 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- *
+ * Servlet responsible for processing the requests to add new receipt type.<p>
+ * 
+ * Valid request must be a JSON object and have given structure:<br>
+ * {<br>
+ *	"name": <i>receipt name</i>,<br>
+ *	"limit": <i>value</i><br>
+ * }
+ * 
  * @author ArtiFixal
  */
 @WebServlet(name = "AddNewReceipt",urlPatterns = {"/addReceipt"})
 public class AddNewReceipt extends HttpServlet{
 	
-	/**
-	 * Handles HTTP <code>PUT</code> method.
+	/** 
+     * Handles the HTTP <code>PUT</code> method.
 	 * 
-	 * @param request
-	 * @param response
-	 * @throws ServletException
-	 * @throws IOException 
-	 */
+     * @param request servlet request
+     * @param response servlet response
+	 * 
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
 	@Override
 	protected void doPut(HttpServletRequest request,HttpServletResponse response)
 			throws ServletException,IOException {
@@ -95,7 +103,7 @@ public class AddNewReceipt extends HttpServlet{
 	 */
 	@Override
 	public String getServletInfo() {
-		return "Inserts into new receipt into DB";
+		return "Inserts new receipt into DB";
 	}
 
 }

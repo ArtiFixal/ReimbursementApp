@@ -20,6 +20,18 @@ public class ConfigIO {
 		this.config=config;
 	}
 	
+	/**
+	 * Reads option value from file specified under object cration.
+	 * 
+	 * @param option Option to search for
+	 * 
+	 * @return Found option, but never null. If reached EOF but option wasn't 
+	 * found exception is thrown.
+	 * 
+	 * @throws FileNotFoundException If file to read wasn't found.
+	 * @throws IOException Any error occurred during reading.
+	 * @throws OptionNotFoundException If searched option wasn't found in file.
+	 */
 	public String readOptionValue(String option) throws FileNotFoundException, 
 			IOException, NullPointerException, OptionNotFoundException {
 		try(FileReader r=new FileReader(config);BufferedReader br=new BufferedReader(r,512)){
@@ -33,6 +45,14 @@ public class ConfigIO {
 		throw new OptionNotFoundException(option,config.getPath());
 	}
 	
+	/**
+	 * Writes option and its value into file specified under object cration.
+	 * 
+	 * @param option Option name by which it value will be accessed in file.
+	 * @param value Value corresponding to the option name.
+	 * 
+	 * @throws IOException Any error occurred during writing.
+	 */
 	public void writeOption(String option,String value) throws IOException{
 		try(FileWriter w=new FileWriter(config);BufferedWriter bw=new BufferedWriter(w)){
 			bw.write("<");
@@ -43,6 +63,13 @@ public class ConfigIO {
 		}
 	}
 	
+	/**
+	 * Writes entire config into file specified under object cration.
+	 * 
+	 * @param configToWrite Line by line config options.
+	 * 
+	 * @throws IOException Any error occurred during writing.
+	 */
 	public void writeEntireConfig(String configToWrite) throws IOException{
 		try(FileWriter w=new FileWriter(config);BufferedWriter bw=new BufferedWriter(w)){
 			bw.write(configToWrite);

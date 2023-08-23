@@ -12,19 +12,32 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- *
+ * Servlet responsible for processing delete requests of existing receipt types.<p>
+ * 
+ * Valid request must be a JSON object and contain "id" field with id of
+ * {@code ReceiptType} to delete.
+ * 
  * @author ArtiFixal
  */
 @WebServlet(name="DeleteReceipt", urlPatterns={"/deleteReceipt"})
 public class DeleteReceipt extends HttpServlet {
 	
+	/** 
+     * Handles the HTTP <code>DELETE</code> method.
+	 * 
+     * @param request servlet request
+     * @param response servlet response
+	 * 
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
 	@Override
-	protected void doDelete(HttpServletRequest reqest,HttpServletResponse response)
+	protected void doDelete(HttpServletRequest request,HttpServletResponse response)
 			throws ServletException,IOException {
 		ObjectMapper mapper=new ObjectMapper();
-		final Map<String,String> jsonMap=mapper.readValue(reqest.getInputStream(),Map.class);
+		final Map<String,String> jsonMap=mapper.readValue(request.getInputStream(),Map.class);
 		String stringIdValue=jsonMap.get("id");
-		// Check existence
+		// Check id existence
 		if(stringIdValue!=null)
 		{
 			// Check id validity
@@ -54,10 +67,13 @@ public class DeleteReceipt extends HttpServlet {
 		}
 	}
 	
+	/** 
+     * Returns a short description of the servlet.
+	 * 
+     * @return a String containing servlet description
+     */
 	@Override
 	public String getServletInfo() {
-		return "Deletes selected receipt from DB";
+		return "Deletes given receipt from DB";
 	}
-   
-    
 }

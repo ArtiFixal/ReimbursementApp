@@ -5,15 +5,25 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
- *
+ * Singleton which stores test config.
+ * 
  * @author ArtiFixal
  */
 public class TestConfig {
 	
+	/**
+	 * File where test config is saved.
+	 */
 	private final static File TEST_CONFIG=new File("testConfig.cfg");
 	
+	/**
+	 * Stores URL to the app.
+	 */
 	private final String appUrl;
 	
+	/**
+	 * Singleton instance of config.
+	 */
 	private static TestConfig config;
 
 	private TestConfig() throws IOException, FileNotFoundException,

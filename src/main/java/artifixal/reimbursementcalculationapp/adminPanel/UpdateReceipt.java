@@ -17,12 +17,29 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- *
+ * Servlet responsible for processing {@code ReceiptType} update requests.
+ * 
+ * Valid request must be a JSON object with given structure: <br>
+ * { <br>
+ *	"id": <i> receipt type id </i><br>
+ *	"name": <i> new receipt name </i><b> *Optional* </b><br>
+ *	"limit": <i> new limit amount per receipt type </i> <b> *Optional* </b><br>
+ * }
+ * 
  * @author ArtiFixal
  */
 @WebServlet(name="UpdateReceipt", urlPatterns={"/updateReceipt"})
 public class UpdateReceipt extends HttpServlet {
 
+	/** 
+     * Handles the HTTP <code>POST</code> method.
+	 * 
+     * @param request servlet request
+     * @param response servlet response
+	 * 
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
 	@Override
 	protected void doPost(HttpServletRequest request,HttpServletResponse response) throws ServletException,IOException {
 		ObjectMapper mapper=new JsonMapper();
@@ -93,11 +110,11 @@ public class UpdateReceipt extends HttpServlet {
 	
     /** 
      * Returns a short description of the servlet.
+	 * 
      * @return a String containing servlet description
      */
     @Override
     public String getServletInfo() {
         return "Updates receipt data in DB";
-    }// </editor-fold>
-
+    }
 }

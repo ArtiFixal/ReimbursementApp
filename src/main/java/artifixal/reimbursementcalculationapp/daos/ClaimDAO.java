@@ -9,12 +9,37 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Optional;
 
 /**
- *
+ * Class responsible for operations related to reimbursement claims. This 
+ * class operates on <b>claims</b>, <b>mileages</b> and <b>receipts</b> tables,
+ * since mileages are optional and claims are in relationship with user receitps 
+ * as 1-*.
+ * 
+ * Tables have the given structure: <p>
+ * claims( <br>
+ *	id INT UNSIGNED <b>AI PK</b>, <br>
+ *	userID INT UNSIGNED <b>FK</b>, <br>
+ *	dateFrom DATE NOT NULL, <br>
+ *	dateTo DATE NOT NULL, <br>
+ *	ignoredDays JSON NOT NULL <br>
+ * ) <p>
+ * 
+ * mileages( <br>
+ *	id INT UNSIGNED <b>AI PK</b>, <br>
+ *	claimID INT UNIGNED <b>FK</b>, <br>
+ *	distance INT UNSIGNED NOT NULL <br>
+ * ) <p>
+ * 
+ * receipts( <br>
+ *	id INT UNSIGNED <b>AI PK</b>, <br>
+ *	claimID INT UNSIGNED <b>FK</b>, <br>
+ *	receiptID INT UNSIGNED <b>FK</b>, <br>
+ *	amount DECIMAL(12,2) NOT NULL <br>
+ * )
+ * 
  * @author ArtiFixal
  */
 public class ClaimDAO implements AutoCloseable{
@@ -28,7 +53,12 @@ public class ClaimDAO implements AutoCloseable{
 		this.con=con;
 	}
 	
-	private void rollback() throws SQLException
+	/**
+	 * Rollbacks transaction and sets auto commit to its default behavior.
+	 * 
+	 * @throws SQLException Any error occurred during transaction rollback.
+	 */
+	private void cancelTransaction() throws SQLException
 	{
 		con.rollback();
 		con.setAutoCommit(true);
@@ -70,7 +100,7 @@ public class ClaimDAO implements AutoCloseable{
 					}
 					if(done!=receipts.get().size())
 					{
-						rollback();
+						cancelTransaction();
 						return false;
 					}
 				}
@@ -83,18 +113,18 @@ public class ClaimDAO implements AutoCloseable{
 							claimID+","+mileage.get().toString()+")");
 					if(result!=1)
 					{
-						rollback();
+						cancelTransaction();
 						return false;
 					}
 				}
 			}
 			else
 			{
-				rollback();
+				cancelTransaction();
 				return false;
 			}
 		}catch(SQLException e){
-			rollback();
+			cancelTransaction();
 			throw e;
 		}
 		con.commit();

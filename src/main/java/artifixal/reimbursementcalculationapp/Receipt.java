@@ -3,12 +3,24 @@ package artifixal.reimbursementcalculationapp;
 import java.math.BigDecimal;
 
 /**
- *
+ * Class representing user receipt DB record.
+ * 
  * @author ArtiFixal
  */
 public class Receipt {
+	/**
+	 * ID of related {@code ReceiptType}.
+	 */
 	private final int typeID;
+	
+	/**
+	 * Receipt type name.
+	 */
 	public String name;
+	
+	/**
+	 * User declared receipt value.
+	 */
 	public BigDecimal value;
 
 	public Receipt(int typeID,String name,BigDecimal value) {

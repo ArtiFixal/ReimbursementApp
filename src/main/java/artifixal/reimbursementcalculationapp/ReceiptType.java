@@ -4,7 +4,8 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 /**
- *
+ * Class representing type DB record.
+ * 
  * @author ArtiFixal
  */
 public class ReceiptType {

@@ -15,10 +15,11 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
 /**
- *
+ * Tests related to {@link ReceiptTypeDAO} functionality.
+ * 
  * @author ArtiFixal
  */
-public class ReceiptDAOTest {
+public class ReceiptTypeDAOTest {
 	
 	private static ReceiptTypeDAO dao;
 	private static long lastInsertedReceiptID=0;
@@ -96,6 +97,13 @@ public class ReceiptDAOTest {
 	public void testAllReceiptsMinimalSelection() throws SQLException
 	{
 		assertNotEquals(0,dao.getAllReceiptsMinimal().size());
+	}
+	
+	@Test
+	public void selectReceiptByNotExistingID() throws SQLException
+	{
+		ReceiptType r=dao.getReceiptTypeById(Integer.MAX_VALUE,true);
+		assertNull(r);
 	}
 	
 	@Test

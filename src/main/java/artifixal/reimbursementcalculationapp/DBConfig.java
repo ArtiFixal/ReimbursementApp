@@ -89,6 +89,12 @@ public class DBConfig {
 		return config;
 	}
 	
+	/**
+	 * Creates connection with DB.
+	 * 
+	 * @return Connection to the DB.
+	 * @throws SQLException Any error occurred during connection validation.
+	 */
 	public Connection createConnection() throws SQLException{
 		return DriverManager.getConnection(dbUrl,dbUser,dbPass);
 	}

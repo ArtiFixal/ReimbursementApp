@@ -3,7 +3,8 @@ package artifixal.reimbursementcalculationapp;
 import java.math.BigDecimal;
 
 /**
- *
+ * Class representing DB limit record.
+ * 
  * @author ArtiFixal
  */
 public class Limit {

@@ -30,10 +30,11 @@ import javax.servlet.http.HttpServletResponse;
 public class MakeClaim extends HttpServlet {
 	
 	/**
-	 * Handles the HTTP <code>POST</code> method.
+	 * Handles the HTTP <code>PUT</code> method.
 	 *
 	 * @param request servlet request
 	 * @param response servlet response
+	 * 
 	 * @throws ServletException if a servlet-specific error occurs
 	 * @throws IOException if an I/O error occurs
 	 */
@@ -43,7 +44,6 @@ public class MakeClaim extends HttpServlet {
 		ObjectMapper mapper=new ObjectMapper()
 				.registerModule(new JavaTimeModule());
 		try{
-			//request.setCharacterEncoding("utf8");
 			JsonNode jsonRequest=mapper.readValue(request.getInputStream(),
 					JsonNode.class);
 			JsonNode tripStartNode=jsonRequest.get("dateFrom");
@@ -139,5 +139,4 @@ public class MakeClaim extends HttpServlet {
 	public String getServletInfo() {
 		return "Inserts user claim into DB";
 	}
-
 }

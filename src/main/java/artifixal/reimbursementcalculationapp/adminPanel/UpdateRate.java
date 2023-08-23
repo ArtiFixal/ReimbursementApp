@@ -14,7 +14,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- *
+ * Servlet responsible for processing update requests related to rates.<p>
+ * 
+ * Valid request must be a JSON object with given structure:<br>
+ * { <br>
+ *	"id": <i> rate id </i><br>
+ *	"amount": <i> new rate amount </i> <b> *Optional* </b><br>
+ *	"limit": <i> new rate limit </i> <b> *Optional* </b><br>
+ * }
+ * 
  * @author ArtiFixal
  */
 @WebServlet(name="UpdateRate", urlPatterns={"/updateRate"})
@@ -39,6 +47,15 @@ public class UpdateRate extends HttpServlet {
 		return optionalField;
 	}
 	
+	/** 
+     * Handles the HTTP <code>POST</code> method.
+	 * 
+     * @param request servlet request
+     * @param response servlet response
+	 * 
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
@@ -88,11 +105,11 @@ public class UpdateRate extends HttpServlet {
 
     /** 
      * Returns a short description of the servlet.
+	 * 
      * @return a String containing servlet description
      */
     @Override
     public String getServletInfo() {
-        return "Updates rate info";
-    }// </editor-fold>
-
+        return "Updates rate info in DB";
+    }
 }

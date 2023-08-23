@@ -8,7 +8,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 /**
- *
+ * Tests related to {@link MakeClaim} {@code Servlet} functionality.
+ * 
  * @author ArtiFixal
  */
 public class MakeClaimTest {
