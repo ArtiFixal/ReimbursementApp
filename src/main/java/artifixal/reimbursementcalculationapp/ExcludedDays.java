@@ -46,6 +46,19 @@ public class ExcludedDays {
 	}
 	
 	/**
+	 * @return Total number of days excluded from allowance.
+	 */
+	public int getTotalNumberOfExcludedDays()
+	{
+		int excluded=days.size();
+		for(int i=0;i<periods.size();i++)
+		{
+			excluded+=periods.get(i).getNumberOfDaysPassed();
+		}
+		return excluded;
+	}
+	
+	/**
 	 * Converts date from JSON object request node into {@code LocalDate}.
 	 * 
 	 * @param mapper Referene to the mapper.
