@@ -46,7 +46,7 @@ public class ConfigIO {
 	}
 	
 	/**
-	 * Writes option and its value into file specified under object cration.
+	 * Appends option and its value into file specified under object cration.
 	 * 
 	 * @param option Option name by which it value will be accessed in file.
 	 * @param value Value corresponding to the option name.
@@ -54,7 +54,7 @@ public class ConfigIO {
 	 * @throws IOException Any error occurred during writing.
 	 */
 	public void writeOption(String option,String value) throws IOException{
-		try(FileWriter w=new FileWriter(config);BufferedWriter bw=new BufferedWriter(w)){
+		try(FileWriter w=new FileWriter(config,true);BufferedWriter bw=new BufferedWriter(w)){
 			bw.write("<");
 			bw.write(option);
 			bw.write(">");
