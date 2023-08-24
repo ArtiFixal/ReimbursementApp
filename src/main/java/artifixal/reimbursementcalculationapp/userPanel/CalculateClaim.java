@@ -101,22 +101,26 @@ public class CalculateClaim extends ClaimServlet {
 	protected void processRequest(ObjectMapper mapper,JsonNode tripStartNode,
 				JsonNode tripEndNode,Optional<ArrayList<Receipt>> receiptsList,
 				Optional<ExcludedDays> excluded,Optional<Integer> mileage,
-				HttpServletResponse response) throws IOException{
+				HttpServletResponse response) throws IOException
+	{
 		try(Connection singleCon=DBConfig.getInstance().createConnection()){
 			try(LimitDAO limitDao=new LimitDAO(singleCon);
 				ReceiptTypeDAO typeDao=new ReceiptTypeDAO(singleCon);
 				RatesDAO ratesDao=new RatesDAO(singleCon)){
+				// Get dates
 				LocalDate tripStart=mapper.convertValue(tripStartNode,
 						LocalDate.class);
 				LocalDate tripEnd=mapper.convertValue(tripEndNode,
 						LocalDate.class);
-				final BigDecimal totalClaimLimit=limitDao.getTotalLimit()
-						.getAmount();
-				BigDecimal value=BigDecimal.ZERO;
+				
+				BigDecimal claimAmount=BigDecimal.ZERO;
+				// Get receipts
 				final ArrayList<ReceiptType> receiptLimits=typeDao.getAllReceipts();
 				final HashMap<Integer,BigDecimal> allowancePerReceipt=new HashMap<>();
+				// If receipts exists sum amount owed for them
 				if(receiptsList.isPresent())
 				{
+					// Sum receipts amount and make sure tehey don't exceed limit
 					for(Receipt r:receiptsList.get())
 					{
 						addToMapNoExceed(allowancePerReceipt,r.getTypeID(),
@@ -124,22 +128,49 @@ public class CalculateClaim extends ClaimServlet {
 										.getLimit());
 					}
 					Set<Integer> keys=allowancePerReceipt.keySet();
+					// Add receipts to claim amount
 					for(Iterator<Integer> it=keys.iterator();it.hasNext();)
 					{
-						value=value.add(allowancePerReceipt.get(it.next()));
+						claimAmount=claimAmount.add(allowancePerReceipt.
+								get(it.next()));
 					}
 				}
+				// If excluded days exists sum amount owed for them
 				if(excluded.isPresent())
 				{
-					
+					int daysPassed=Period.getNumberOfDaysPassed(tripStart
+							,tripEnd)-excluded.get().getTotalNumberOfExcludedDays();
+					Rate allowanceRate=ratesDao.getAllowanceRate();
+					BigDecimal allowance=allowanceRate.getRate()
+							.multiply(BigDecimal.valueOf(daysPassed));
+					// Make sure owed amount won't exceed limit
+					if(allowance.compareTo(allowanceRate.getLimit())<1)
+						claimAmount=claimAmount.add(allowance);
+					else
+						claimAmount=claimAmount.add(allowanceRate.getLimit());
 				}
+				// If mileage exists sum amount owed for it
 				if(mileage.isPresent())
 				{
-					value=value.add(ratesDao.getMileageRate().getRate().
-							multiply(BigDecimal.valueOf(mileage.get())));
+					int distanceLimit=limitDao.getDistanceLimit().getAmount()
+							.intValue();
+					BigDecimal mileageAmount;
+					// Make sure that mileage won't exceed distance limit.
+					if(mileage.get()>distanceLimit)
+						mileageAmount=ratesDao.getMileageRate().getRate()
+							.multiply(BigDecimal.valueOf(distanceLimit));
+					else
+						mileageAmount=ratesDao.getMileageRate().getRate()
+							.multiply(BigDecimal.valueOf(mileage.get()));
+					claimAmount=claimAmount.add(mileageAmount);
 				}
+				final BigDecimal totalClaimLimit=limitDao.getTotalLimit()
+						.getAmount();
 				try(PrintWriter w=new PrintWriter(response.getOutputStream())){
-					w.write(value.toString());
+					if(claimAmount.compareTo(totalClaimLimit)==1)
+						w.write(claimAmount.toString());
+					else
+						w.write(totalClaimLimit.toString());
 					response.setStatus(HttpServletResponse.SC_OK);
 				}
 			}catch(SQLException e){
