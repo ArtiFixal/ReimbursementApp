@@ -1,10 +1,8 @@
 package artifixal.reimbursementcalculationapp.daos;
 
-import artifixal.reimbursementcalculationapp.DBConfig;
 import artifixal.reimbursementcalculationapp.Limit;
 import java.math.BigDecimal;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -20,7 +18,7 @@ import java.sql.Statement;
  * 
  * @author ArtiFixal
  */
-public class LimitDAO implements AutoCloseable{
+public class LimitDAO extends DAOObject{
 	/**
 	 * ID of total possible amount owed for single reimbursement claim.
 	 */
@@ -31,25 +29,13 @@ public class LimitDAO implements AutoCloseable{
 	 * value.
 	 */
 	public final static int DISTANCE_LIMIT_ID=2;
-	
-	private final Connection con;
 
 	public LimitDAO() throws SQLException {
-		con=DBConfig.getInstance().createConnection();
+		super();
 	}
 
 	public LimitDAO(Connection con) {
-		this.con=con;
-	}
-
-	/**
-	 * Closes connection with DB.
-	 * 
-	 * @throws SQLException Any error occured during connection close try.
-	 */
-	@Override
-	public void close() throws SQLException {
-		con.close();
+		super(con);
 	}
 	
 	/**
@@ -62,12 +48,9 @@ public class LimitDAO implements AutoCloseable{
 	 */
 	public Limit getLimitById(int id) throws SQLException
 	{
-		try(Statement select=con.createStatement()){
-			ResultSet result=select.executeQuery("SELECT amount FROM limits WHERE id="+id);
-			result.next();
-			BigDecimal amount=result.getBigDecimal("amount");
-			return new Limit(id,amount);
-		}	
+		BigDecimal amount=getSingleNumber("SELECT amount FROM limits WHERE id="
+				+id,BigDecimal.class);
+		return new Limit(id,amount);
 	}
 	
 	/**

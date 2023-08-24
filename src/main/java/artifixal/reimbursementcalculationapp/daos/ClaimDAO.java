@@ -1,6 +1,5 @@
 package artifixal.reimbursementcalculationapp.daos;
 
-import artifixal.reimbursementcalculationapp.DBConfig;
 import artifixal.reimbursementcalculationapp.ExcludedDays;
 import artifixal.reimbursementcalculationapp.Receipt;
 import java.sql.Connection;
@@ -42,15 +41,14 @@ import java.util.Optional;
  * 
  * @author ArtiFixal
  */
-public class ClaimDAO implements AutoCloseable{
-	private final Connection con;
+public class ClaimDAO extends DAOObject{
 
 	public ClaimDAO() throws SQLException {
-		this.con=DBConfig.getInstance().createConnection();
+		super();
 	}
 
 	public ClaimDAO(Connection con) {
-		this.con=con;
+		super(con);
 	}
 	
 	/**
@@ -84,7 +82,7 @@ public class ClaimDAO implements AutoCloseable{
 				insert.setString(4,"{}");
 			if(insert.executeUpdate()==1)
 			{
-				final long claimID=DaoUtils.getLastInsertedId(con);
+				final long claimID=getLastInsertedId();
 				// Check for receipts existence
 				if(receipts.isPresent())
 				{
@@ -131,10 +129,4 @@ public class ClaimDAO implements AutoCloseable{
 		con.setAutoCommit(true);
 		return true;
 	}
-
-	@Override
-	public void close() throws SQLException {
-		con.close();
-	}
-	
 }

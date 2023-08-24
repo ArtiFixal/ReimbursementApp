@@ -1,6 +1,5 @@
 package artifixal.reimbursementcalculationapp.daos;
 
-import artifixal.reimbursementcalculationapp.DBConfig;
 import artifixal.reimbursementcalculationapp.ReceiptType;
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -24,16 +23,14 @@ import java.util.Optional;
  * 
  * @author ArtiFixal
  */
-public class ReceiptTypeDAO implements AutoCloseable{
-	
-	private final Connection con;
+public class ReceiptTypeDAO extends DAOObject{
 
 	public ReceiptTypeDAO() throws SQLException{
-		con=DBConfig.getInstance().createConnection();
+		super();
 	}
 
 	public ReceiptTypeDAO(Connection con) {
-		this.con=con;
+		super(con);
 	}
 	
 	/**
@@ -51,7 +48,7 @@ public class ReceiptTypeDAO implements AutoCloseable{
 		Statement selectReceipt=con.createStatement();
 		ResultSet result;
 		if(includeLimit)
-			result=selectReceipt.executeQuery("SELECT name,limit FROM types WHERE id="+id);
+			result=selectReceipt.executeQuery("SELECT name,`limit` FROM types WHERE id="+id);
 		else
 			result=selectReceipt.executeQuery("SELECT name FROM types WHERE id="+id);
 		result.next();
@@ -88,7 +85,7 @@ public class ReceiptTypeDAO implements AutoCloseable{
 					insertStatement.setBigDecimal(1,limit);
 					insertStatement.setString(2,r.getName());
 					insertStatement.executeUpdate();
-					return DaoUtils.getLastInsertedId(con);
+					return getLastInsertedId();
 				}
 			}
 		}
@@ -238,15 +235,5 @@ public class ReceiptTypeDAO implements AutoCloseable{
 	 */
 	public boolean deleteReceipt(ReceiptType r) throws SQLException{
 		return deleteReceipt(r.getId());
-	}
-	
-	/**
-	 * Closes connection with DB.
-	 * 
-	 * @throws SQLException Any error occured during connection close try.
-	 */
-	@Override
-	public void close() throws SQLException {
-		con.close();
 	}
 }

@@ -1,6 +1,5 @@
 package artifixal.reimbursementcalculationapp.daos;
 
-import artifixal.reimbursementcalculationapp.DBConfig;
 import artifixal.reimbursementcalculationapp.Rate;
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -22,7 +21,7 @@ import java.util.Optional;
  * 
  * @author ArtiFixal
  */
-public class RatesDAO implements AutoCloseable{
+public class RatesDAO extends DAOObject{
 	/**
 	 * ID of the allowance rate.
 	 */
@@ -32,25 +31,13 @@ public class RatesDAO implements AutoCloseable{
 	 * ID of the personal car mileage rate.
 	 */
 	public final static int MILEAGE_RATE_ID=2;
-	
-	private final Connection con;
 
 	public RatesDAO() throws SQLException {
-		this.con=DBConfig.getInstance().createConnection();
+		super();
 	}
 
 	public RatesDAO(Connection con) {
-		this.con=con;
-	}
-
-	/**
-	 * Closes connection with DB.
-	 * 
-	 * @throws SQLException Any error occured during connection close try.
-	 */
-	@Override
-	public void close() throws SQLException {
-		con.close();
+		super(con);
 	}
 	
 	/**
