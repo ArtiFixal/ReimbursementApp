@@ -53,6 +53,18 @@
 			<artifactId>jackson-datatype-jsr310</artifactId>
 			<version>2.15.2</version>
 		</dependency>
+                <!-- Jetty server for testing purposes -->
+                <dependency>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-server</artifactId>
+                    <version>9.4.16.v20190411</version>
+                </dependency>
+                <!-- Jetty Servlet support -->
+                <dependency>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-servlet</artifactId>
+                    <version>9.4.16.v20190411</version>
+                </dependency>
 	</dependencies>
 
     <build>
