@@ -140,7 +140,7 @@ public abstract class ClaimServlet extends HttpServlet{
 			if(mileageNode!=null)
 			{
 				try{
-					String s=mileageNode.textValue();
+					String s=mileageNode.asText();
 					mileage=Optional.of(Integer.valueOf(s));
 				}catch(NumberFormatException e){
 					response.sendError(HttpServletResponse.SC_BAD_REQUEST,
