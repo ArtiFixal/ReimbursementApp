@@ -1,20 +1,20 @@
 package artifixal.reimbursementcalculationapp.userPanel;
 
+import artifixal.reimbursementcalculationapp.DBConfig;
 import artifixal.reimbursementcalculationapp.ExcludedDays;
-import artifixal.reimbursementcalculationapp.ExcludedDaysException;
+import artifixal.reimbursementcalculationapp.Period;
+import artifixal.reimbursementcalculationapp.Rate;
 import artifixal.reimbursementcalculationapp.Receipt;
 import artifixal.reimbursementcalculationapp.ReceiptType;
 import artifixal.reimbursementcalculationapp.daos.LimitDAO;
 import artifixal.reimbursementcalculationapp.daos.RatesDAO;
 import artifixal.reimbursementcalculationapp.daos.ReceiptTypeDAO;
-import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.NullNode;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -25,7 +25,6 @@ import java.util.Optional;
 import java.util.Set;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -47,7 +46,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author ArtiFixal
  */
 @WebServlet(name="CalculateClaim", urlPatterns={"/calculateClaim"})
-public class CalculateClaim extends HttpServlet {
+public class CalculateClaim extends ClaimServlet {
 
     /** 
      * Handles the HTTP <code>POST</code> method.
@@ -61,72 +60,52 @@ public class CalculateClaim extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        ObjectMapper mapper=new ObjectMapper()
-				.registerModule(new JavaTimeModule());
-		try{
-			JsonNode jsonRequest=mapper.readValue(request.getInputStream(),
-					JsonNode.class);
-			JsonNode tripStartNode=jsonRequest.get("dateFrom");
-			JsonNode tripEndNode=jsonRequest.get("dateTo");
-			JsonNode receiptsListNode=jsonRequest.get("receipts");
-			JsonNode excludedDaysNode=jsonRequest.get("excluded");
-			JsonNode mileageNode=jsonRequest.get("mileage");
-			if(tripStartNode==null||tripStartNode instanceof NullNode)
-			{
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-						"Malformed JSON request: DateFrom not found");
-				return;
-			}
-			if(tripEndNode==null||tripStartNode instanceof NullNode)
-			{
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-						"Malformed JSON request: DateTo not found");
-				return;
-			}
-			Optional<ArrayList<Receipt>> receiptsList=Optional.empty();
-			if(receiptsListNode!=null)
-			{
-				try{
-					ArrayList<Receipt> array=UserServletUtils
-							.readReceiptsFromNode(receiptsListNode);
-					receiptsList=Optional.ofNullable(array);
-				}catch(NumberFormatException e){
-					response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-						"Malformed JSON request: Receipt list is unreadable");
-					return;
-				}
-			}
-			Optional<ExcludedDays> excluded=Optional.empty();
-			if(excludedDaysNode!=null)
-			{
-				try{
-					excluded=Optional.of(ExcludedDays.readFrom(excludedDaysNode));
-				}catch(ExcludedDaysException e){
-					response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-						"Malformed JSON request: Exclude days list have errors: "+
-								e.getMessage());
-					return;
-				}catch(IllegalArgumentException e){
-					System.out.println(e);
-					response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-						"Malformed JSON request: Exclude days list is unreadable");
-					return;
-				}
-			}
-			Optional<Integer> mileage=Optional.empty();
-			if(mileageNode!=null)
-			{
-				try{
-					String s=mileageNode.textValue();
-					mileage=Optional.of(Integer.valueOf(s));
-				}catch(NumberFormatException e){
-					response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-						"Malformed JSON request: Mileage have to be a number");
-					return;
-				}
-			}
-			try(LimitDAO limitDao=new LimitDAO();ReceiptTypeDAO typeDao=
-					new ReceiptTypeDAO();RatesDAO ratesDao=new RatesDAO()){
+		validateAndProcessRequest(request,response);
+    }
+	
+	private void addToMapNoExceed(HashMap<Integer,BigDecimal> map,Integer key,
+			BigDecimal value,BigDecimal limit)
+	{
+		if(map.containsKey(key))
+		{
+			BigDecimal newValue=map.get(key).add(value);
+			putIfNoExceed(map,key,newValue,limit);
+		}
+		else
+		{
+			putIfNoExceed(map,key,value,limit);
+		}
+			
+	}
+	
+	private void putIfNoExceed(HashMap<Integer,BigDecimal> map,Integer key,
+			BigDecimal value,BigDecimal limit)
+	{
+		if(value.compareTo(limit)>=0)
+				map.put(key,limit);
+			else
+				map.put(key,value);
+	}
+
+    /** 
+     * Returns a short description of the servlet.
+	 * 
+     * @return a String containing servlet description
+     */
+    @Override
+    public String getServletInfo() {
+        return "Calculates claim value";
+    }
+
+	@Override
+	protected void processRequest(ObjectMapper mapper,JsonNode tripStartNode,
+				JsonNode tripEndNode,Optional<ArrayList<Receipt>> receiptsList,
+				Optional<ExcludedDays> excluded,Optional<Integer> mileage,
+				HttpServletResponse response) throws IOException{
+		try(Connection singleCon=DBConfig.getInstance().createConnection()){
+			try(LimitDAO limitDao=new LimitDAO(singleCon);
+				ReceiptTypeDAO typeDao=new ReceiptTypeDAO(singleCon);
+				RatesDAO ratesDao=new RatesDAO(singleCon)){
 				LocalDate tripStart=mapper.convertValue(tripStartNode,
 						LocalDate.class);
 				LocalDate tripEnd=mapper.convertValue(tripEndNode,
@@ -164,55 +143,15 @@ public class CalculateClaim extends HttpServlet {
 					response.setStatus(HttpServletResponse.SC_OK);
 				}
 			}catch(SQLException e){
-				System.out.println(e);
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 						"An error occured during processing DB request");
 			}catch(DateTimeParseException e){
 				response.sendError(HttpServletResponse.SC_BAD_REQUEST,
 						"Malformed JSON request: Dates are unreadeable");
 			}
-		}catch(StreamReadException e){
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-						"Malformed JSON request: Failed to read JSON request");
+		}catch(SQLException ex){
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+						"Connection to DB failed");
 		}
-    }
-	
-	/*private int getDaysCount(LocalDate from,LocalDate to,ExcludedDays ex)
-	{
-		from.until(to).
-	}*/
-	
-	private void addToMapNoExceed(HashMap<Integer,BigDecimal> map,Integer key,
-			BigDecimal value,BigDecimal limit)
-	{
-		if(map.containsKey(key))
-		{
-			BigDecimal newValue=map.get(key).add(value);
-			putIfNoExceed(map,key,newValue,limit);
-		}
-		else
-		{
-			putIfNoExceed(map,key,value,limit);
-		}
-			
 	}
-	
-	private void putIfNoExceed(HashMap<Integer,BigDecimal> map,Integer key,
-			BigDecimal value,BigDecimal limit)
-	{
-		if(value.compareTo(limit)>=0)
-				map.put(key,limit);
-			else
-				map.put(key,value);
-	}
-
-    /** 
-     * Returns a short description of the servlet.
-	 * 
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Calculates claim value";
-    }
 }
