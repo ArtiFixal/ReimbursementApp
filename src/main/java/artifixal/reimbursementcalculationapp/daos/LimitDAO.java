@@ -43,7 +43,7 @@ public class LimitDAO extends DAOObject{
 	 * 
 	 * @param id ID by which we want to select {@code Limit} record.
 	 * 
-	 * @return Selected limit.
+	 * @return Selected limit or null if there is no result.
 	 * @throws SQLException Any error occured during the query.
 	 */
 	public Limit getLimitById(int id) throws SQLException

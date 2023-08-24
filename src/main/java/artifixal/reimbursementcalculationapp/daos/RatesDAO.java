@@ -45,7 +45,7 @@ public class RatesDAO extends DAOObject{
 	 * 
 	 * @param id ID by which we want to select {@code Rate} record.
 	 * 
-	 * @return Selected rate.
+	 * @return Selected rate or null if there is no result.
 	 * 
 	 * @throws SQLException Any error occured during the query.
 	 * @see Rate
@@ -54,6 +54,8 @@ public class RatesDAO extends DAOObject{
 	{
 		try(Statement select=con.createStatement()){
 			ResultSet result=select.executeQuery("SELECT amount,`limit` FROM rates WHERE id="+id);
+			if(!result.isBeforeFirst())
+				return null;
 			result.next();
 			BigDecimal amount=result.getBigDecimal("amount");
 			BigDecimal limit=result.getBigDecimal("limit");

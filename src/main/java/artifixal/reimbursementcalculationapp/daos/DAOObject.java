@@ -33,7 +33,7 @@ public abstract class DAOObject implements AutoCloseable{
 	 * @param sql Selection query of wanted number.
 	 * @param numberTypeToReturn What type to return
 	 * 
-	 * @return Selected number.
+	 * @return Selected number or null if there is no result.
 	 * @throws SQLException Any error occurred during the query.
 	 */
 	public <T extends Number> T getSingleNumber(String sql,
@@ -42,6 +42,8 @@ public abstract class DAOObject implements AutoCloseable{
 		Statement count=con.createStatement();
 		T value;
 		try(ResultSet result=count.executeQuery(sql)) {
+			if(!result.isBeforeFirst())
+				return null;
 			result.next();
 			value=result.getObject(1,numberTypeToReturn);
 		}

@@ -39,7 +39,7 @@ public class ReceiptTypeDAO extends DAOObject{
 	 * @param id ID by which we want to select {@code ReceiptType} record.
 	 * @param includeLimit Should limit be included into query?
 	 * 
-	 * @return Selected receipt type.
+	 * @return Selected receipt type or null if there is no result.
 	 * @throws SQLException Any error occurred during the query.
 	 * @see ReceiptType
 	 */
@@ -51,6 +51,8 @@ public class ReceiptTypeDAO extends DAOObject{
 			result=selectReceipt.executeQuery("SELECT name,`limit` FROM types WHERE id="+id);
 		else
 			result=selectReceipt.executeQuery("SELECT name FROM types WHERE id="+id);
+		if(!result.isBeforeFirst())
+			return null;
 		result.next();
 		String name=result.getString("name");
 		BigDecimal limit=null;
