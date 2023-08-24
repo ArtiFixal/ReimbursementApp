@@ -1,14 +1,16 @@
 package artifixal.reimbursementcalculationapp.adminPanel;
 
 import artifixal.reimbursementcalculationapp.DBConfig;
-import artifixal.reimbursementcalculationapp.TestConfig;
+import artifixal.reimbursementcalculationapp.MinimalServletServer;
 import artifixal.reimbursementcalculationapp.testUtils.ServletUtilis;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import org.junit.jupiter.api.AfterAll;
 import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -18,14 +20,20 @@ import org.junit.jupiter.api.Test;
  */
 public class AddNewReceiptTest {
 	
-	private static final String APP_URL=TestConfig.getInstance().getAppUrl()+
-			"/addReceipt";
+	private static final MinimalServletServer testServer=
+			new MinimalServletServer(AddNewReceipt.class);
+	
+	@BeforeAll
+	public static void startServer() throws Exception
+	{
+		testServer.startServer();
+	}
 	
 	private void sendRequestAndTestResponseCode(String json,
 			int exceptedResponseCode,String errorMsg) throws IOException
 	{
 		HttpURLConnection con=
-				ServletUtilis.sendRequest(APP_URL,"PUT",ServletUtilis.JSON_CONTENT,json);
+				ServletUtilis.sendRequest(testServer.getURL(),"PUT",ServletUtilis.JSON_CONTENT,json);
 		int response=con.getResponseCode();
 		assertEquals(exceptedResponseCode,response,
 				errorMsg+". Code: "+response+" Message: "+con.getResponseMessage());
@@ -73,5 +81,11 @@ public class AddNewReceiptTest {
 		String json="{\"name\":\"backendTest\",\"limit\":-123}";
 		sendRequestAndTestResponseCode(json,HttpURLConnection.HTTP_BAD_REQUEST,
 				"Negative limit test failed");
+	}
+	
+	@AfterAll
+	public static void stopServer() throws Exception
+	{
+		testServer.startServer();
 	}
 }
