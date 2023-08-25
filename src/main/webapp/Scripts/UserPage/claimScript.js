@@ -236,16 +236,16 @@ function collectExcludedDays()
 				days.periods.push(data);
 		}
 	}
-        if(data.days.length===0&&data.periods.length===0)
+        if(days.days.length===0&&days.periods.length===0)
         {
-            delete data.days;
-            delete data.periods;
+            delete days.days;
+            delete days.periods;
             return null;
         }
-        if(data.days.length===0)
-            delete data.days;
+        if(days.days.length===0)
+            delete days.days;
         else
-            delete data.periods;
+            delete days.periods;
 	return days;
 }
 
