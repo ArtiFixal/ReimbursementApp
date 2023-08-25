@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -162,9 +163,9 @@ public class CalculateClaim extends ClaimServlet {
 						.getAmount();
 				try(PrintWriter w=new PrintWriter(response.getOutputStream())){
 					if(claimAmount.compareTo(totalClaimLimit)==1)
-						w.write(claimAmount.toString());
+						w.write(claimAmount.setScale(2,RoundingMode.FLOOR).toString());
 					else
-						w.write(totalClaimLimit.toString());
+						w.write(totalClaimLimit.setScale(2,RoundingMode.FLOOR).toString());
 					response.setStatus(HttpServletResponse.SC_OK);
 				}
 			}catch(SQLException e){
