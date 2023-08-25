@@ -44,6 +44,34 @@ public class MakeClaimTest {
 				"Claim insert failed");
 	}
 	
+	@Test
+	public void excludedDayOutOfDateFromDateToBoundsTest() throws IOException
+	{
+		String json="{\"dateFrom\":\"2010-10-14T20:00:00.000Z\",\"dateTo\":"
+				+ "\"2010-10-21T20:00:00.000Z\",\"excluded\":{\"days\":["
+				+ "\"2010-01-14T20:00:00.000Z\"],\"periods\":[{"
+				+ "\"from\":\"2010-10-17T20:00:00.000Z\",\"to\":"
+				+ "\"2010-10-19T20:00:00.000Z\"}]},"
+				+ "\"receipts\":[{\"id\":1,\"name\":\"taxi\",\"value\":\"120.5\"},"
+				+ "{\"id\":3,\"name\":\"plane ticket\",\"value\":\"321.4\"}]}";
+		sendRequestAndTestResponseCode(json,HttpURLConnection.HTTP_BAD_REQUEST,
+				"Claim excluded days day validation failed");
+	}
+	
+	@Test
+	public void excludedPeriodOutOfDateFromDateToBoundsTest() throws IOException
+	{
+		String json="{\"dateFrom\":\"2010-10-14T20:00:00.000Z\",\"dateTo\":"
+				+ "\"2010-10-21T20:00:00.000Z\",\"excluded\":{\"days\":["
+				+ "\"2010-10-14T20:00:00.000Z\"],\"periods\":[{"
+				+ "\"from\":\"2015-10-17T20:00:00.000Z\",\"to\":"
+				+ "\"2015-10-19T20:00:00.000Z\"}]},"
+				+ "\"receipts\":[{\"id\":1,\"name\":\"taxi\",\"value\":\"120.5\"},"
+				+ "{\"id\":3,\"name\":\"plane ticket\",\"value\":\"321.4\"}]}";
+		sendRequestAndTestResponseCode(json,HttpURLConnection.HTTP_BAD_REQUEST,
+				"Claim excluded days period validation failed");
+	}
+	
 	@AfterAll
 	public static void stopServer() throws Exception
 	{
