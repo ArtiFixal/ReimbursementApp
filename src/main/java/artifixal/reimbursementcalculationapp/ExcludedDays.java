@@ -121,10 +121,26 @@ public class ExcludedDays {
 		};
 	}
 	
+	private static boolean isDayInTripBounds(LocalDate day,LocalDate tripStart,
+			LocalDate tripEnd)
+	{
+		return day.compareTo(tripStart)>=0&&day.compareTo(tripEnd)<=0;
+	}
+	
+	private static boolean isPeriodInTripBounds(Period p,LocalDate tripStart,
+			LocalDate tripEnd)
+	{
+		if(isDayInTripBounds(p.getDateFrom(),tripStart,tripEnd))
+			return isDayInTripBounds(p.getDateTo(),tripStart,tripEnd);
+		return false;
+	}
+	
 	/**
 	 * Reads {@code ExcludedDays} object from given {@code JsonNode}.
 	 * 
 	 * @param node From which to read.
+	 * @param tripStart
+	 * @param tripEnd
 	 * 
 	 * @return ExcludedDays object.
 	 * 
@@ -132,7 +148,8 @@ public class ExcludedDays {
 	 * @throws IllegalArgumentException If any date isn't convertable into 
 	 * {@code LodalDate}
 	 */
-	public static ExcludedDays readFrom(JsonNode node) throws ExcludedDaysException,
+	public static ExcludedDays readFrom(JsonNode node,LocalDate tripStart,
+			LocalDate tripEnd) throws ExcludedDaysException,
 			IllegalArgumentException{
 		final JsonNode daysNode=node.get("days");
 		final JsonNode periodNode=node.get("periods");
@@ -146,7 +163,10 @@ public class ExcludedDays {
 			JsonNode nextNode;
 			while((nextNode=daysNode.get(i))!=null)
 			{
-				excluded.addDay(getLocalDateFromNode(mapper,nextNode));
+				LocalDate current=getLocalDateFromNode(mapper,nextNode);
+				if(!isDayInTripBounds(current,tripStart,tripEnd))
+					throw new ExcludedDaysException("Exluded day is out of trip bounds");
+				excluded.addDay(current);
 				i++;
 			}
 			excluded.getDays().sort(createAscLocalDateComparator());
@@ -172,6 +192,8 @@ public class ExcludedDays {
 				while((nextNode=periodNode.get(i))!=null)
 				{
 					Period current=getPeriodFromNode(mapper,nextNode);
+					if(!isPeriodInTripBounds(current,tripStart,tripEnd))
+						throw new ExcludedDaysException("Exluded period is out of trip bounds");
 					int compareResult=current.getDateFrom().compareTo(current.getDateTo());
 					if(compareResult>0)
 						throw new ExcludedDaysException("Period dateFrom is after dateTo");
@@ -205,7 +227,6 @@ public class ExcludedDays {
 	{
 		final StringBuilder json=new StringBuilder("{");
 		boolean daysExist=false;
-		System.out.println(days.size());
 		if(!days.isEmpty())
 		{
 			json.append("\"days\":[");

@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Optional;
 import javax.servlet.http.HttpServlet;
@@ -38,8 +39,8 @@ public abstract class ClaimServlet extends HttpServlet{
 	 * Medthod in which servlet request is processed.
 	 * 
 	 * @param mapper Mapper used to convert JSON values.
-	 * @param tripStartNode Node containing date of trip start.
-	 * @param tripEndNode Node containing date of trip end.
+	 * @param tripStart Date of trip start.
+	 * @param tripEnd Date of trip end.
 	 * @param receiptsList User declared receipts.
 	 * @param excluded Days excluded from allowance.
 	 * @param mileage Personal car mileage.
@@ -47,8 +48,8 @@ public abstract class ClaimServlet extends HttpServlet{
 	 * 
 	 * @throws IOException If an I/O error occurs.
 	 */
-	protected abstract void processRequest(ObjectMapper mapper,JsonNode tripStartNode,
-				JsonNode tripEndNode,Optional<ArrayList<Receipt>> receiptsList,
+	protected abstract void processRequest(ObjectMapper mapper,LocalDate tripStart,
+				LocalDate tripEnd,Optional<ArrayList<Receipt>> receiptsList,
 				Optional<ExcludedDays> excluded,Optional<Integer> mileage,
 				HttpServletResponse response) throws IOException;
 	
@@ -97,6 +98,7 @@ public abstract class ClaimServlet extends HttpServlet{
 						"Malformed JSON request: DateFrom not found");
 				return;
 			}
+			LocalDate tripStart=mapper.convertValue(tripStartNode,LocalDate.class);
 			// Check for existence of trip end date
 			if(tripEndNode==null||tripStartNode instanceof NullNode)
 			{
@@ -104,6 +106,7 @@ public abstract class ClaimServlet extends HttpServlet{
 						"Malformed JSON request: DateTo not found");
 				return;
 			}
+			LocalDate tripEnd=mapper.convertValue(tripEndNode,LocalDate.class);
 			Optional<ArrayList<Receipt>> receiptsList=Optional.empty();
 			// Get receipts if they exists
 			if(receiptsListNode!=null&&!(receiptsListNode instanceof NullNode))
@@ -122,7 +125,8 @@ public abstract class ClaimServlet extends HttpServlet{
 			if(excludedDaysNode!=null)
 			{
 				try{
-					excluded=Optional.of(ExcludedDays.readFrom(excludedDaysNode));
+					excluded=Optional.of(ExcludedDays.readFrom(excludedDaysNode,
+							tripStart,tripEnd));
 				}catch(ExcludedDaysException e){
 					response.sendError(HttpServletResponse.SC_BAD_REQUEST,
 						"Malformed JSON request: Exclude days list have errors: "+
@@ -149,7 +153,7 @@ public abstract class ClaimServlet extends HttpServlet{
 				}
 			}
 			// If valid process request
-			processRequest(mapper,tripStartNode,tripEndNode,receiptsList,
+			processRequest(mapper,tripStart,tripEnd,receiptsList,
 					excluded,mileage,response);
 		}catch(StreamReadException e){
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST,

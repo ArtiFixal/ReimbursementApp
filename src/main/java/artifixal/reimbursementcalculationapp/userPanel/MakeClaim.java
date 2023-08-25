@@ -37,17 +37,12 @@ import javax.servlet.http.HttpServletResponse;
 public class MakeClaim extends ClaimServlet {
 	
 	@Override
-	protected void processRequest(ObjectMapper mapper,JsonNode tripStartNode,
-				JsonNode tripEndNode,Optional<ArrayList<Receipt>> receiptsList,
+	protected void processRequest(ObjectMapper mapper,LocalDate tripStart,
+				LocalDate tripEnd,Optional<ArrayList<Receipt>> receiptsList,
 				Optional<ExcludedDays> excluded,Optional<Integer> mileage,
 				HttpServletResponse response) throws IOException{
 		// Send request to DB
 		try(ClaimDAO dao=new ClaimDAO()){
-				// Convert dates
-				LocalDate tripStart=mapper.convertValue(tripStartNode,
-						LocalDate.class);
-				LocalDate tripEnd=mapper.convertValue(tripEndNode,
-						LocalDate.class);
 				// Check if insert was successful
 				if(dao.createClaim(tripStart,tripEnd,receiptsList,
 						excluded,mileage))

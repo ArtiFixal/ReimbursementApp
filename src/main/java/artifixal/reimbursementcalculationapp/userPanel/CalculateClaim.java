@@ -98,8 +98,8 @@ public class CalculateClaim extends ClaimServlet {
     }
 
 	@Override
-	protected void processRequest(ObjectMapper mapper,JsonNode tripStartNode,
-				JsonNode tripEndNode,Optional<ArrayList<Receipt>> receiptsList,
+	protected void processRequest(ObjectMapper mapper,LocalDate tripStart,
+				LocalDate tripEnd,Optional<ArrayList<Receipt>> receiptsList,
 				Optional<ExcludedDays> excluded,Optional<Integer> mileage,
 				HttpServletResponse response) throws IOException
 	{
@@ -107,12 +107,6 @@ public class CalculateClaim extends ClaimServlet {
 			try(LimitDAO limitDao=new LimitDAO(singleCon);
 				ReceiptTypeDAO typeDao=new ReceiptTypeDAO(singleCon);
 				RatesDAO ratesDao=new RatesDAO(singleCon)){
-				// Get dates
-				LocalDate tripStart=mapper.convertValue(tripStartNode,
-						LocalDate.class);
-				LocalDate tripEnd=mapper.convertValue(tripEndNode,
-						LocalDate.class);
-				
 				BigDecimal claimAmount=BigDecimal.ZERO;
 				// Get receipts
 				final ArrayList<ReceiptType> receiptLimits=typeDao.getAllReceipts();
