@@ -9,7 +9,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import org.junit.jupiter.api.AfterAll;
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -32,11 +31,8 @@ public class AddNewReceiptTest {
 	private void sendRequestAndTestResponseCode(String json,
 			int exceptedResponseCode,String errorMsg) throws IOException
 	{
-		HttpURLConnection con=
-				ServletUtilis.sendRequest(testServer.getURL(),"PUT",ServletUtilis.JSON_CONTENT,json);
-		int response=con.getResponseCode();
-		assertEquals(exceptedResponseCode,response,
-				errorMsg+". Code: "+response+" Message: "+con.getResponseMessage());
+		ServletUtilis.sendRequestAndTestResponseCode(testServer.getURL(),"PUT",
+				json,ServletUtilis.JSON_CONTENT,exceptedResponseCode,errorMsg);
 	}
 	
 	@Test

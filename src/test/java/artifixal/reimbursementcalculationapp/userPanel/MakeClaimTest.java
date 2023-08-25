@@ -5,7 +5,6 @@ import artifixal.reimbursementcalculationapp.testUtils.ServletUtilis;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import org.junit.jupiter.api.AfterAll;
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -25,8 +24,15 @@ public class MakeClaimTest {
 		testServer.startServer();
 	}
 	
+	private void sendRequestAndTestResponseCode(String json,
+			int exceptedResponseCode,String errorMsg) throws IOException
+	{
+		ServletUtilis.sendRequestAndTestResponseCode(testServer.getURL(),"PUT",
+				ServletUtilis.JSON_CONTENT,json,exceptedResponseCode,errorMsg);
+	}
+	
 	@Test
-	public void insertValidClaimTest() throws IOException, InterruptedException{
+	public void allFieldsValidClaimRequestTest() throws IOException, InterruptedException{
 		String json="{\"dateFrom\":\"2022-10-14T20:00:00.000Z\",\"dateTo\":"
 				+ "\"2022-10-21T20:00:00.000Z\",\"excluded\":{\"days\":["
 				+ "\"2022-10-14T20:00:00.000Z\"],\"periods\":[{"
@@ -34,11 +40,8 @@ public class MakeClaimTest {
 				+ "\"2022-10-19T20:00:00.000Z\"}]},\"mileage\":135,"
 				+ "\"receipts\":[{\"id\":1,\"name\":\"taxi\",\"value\":\"120.5\"},"
 				+ "{\"id\":3,\"name\":\"plane ticket\",\"value\":\"321.4\"}]}";
-		HttpURLConnection con=ServletUtilis.sendRequest(
-				testServer.getURL(),"PUT",ServletUtilis.JSON_CONTENT,json);
-		int result=con.getResponseCode();
-		assertEquals(HttpURLConnection.HTTP_OK,result,
-				"Claim insert failed. Code: "+result+" Message: "+con.getResponseMessage());
+		sendRequestAndTestResponseCode(json,HttpURLConnection.HTTP_OK,
+				"Claim insert failed");
 	}
 	
 	@AfterAll
