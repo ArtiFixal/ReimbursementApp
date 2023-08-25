@@ -1,8 +1,8 @@
 -- Create DB
-DROP DATABASE IF EXISTS reibursements;
+DROP DATABASE IF EXISTS reimbursement;
 
-CREATE DATABASE reibursements CHARACTER SET utf8 COLLATE=utf8_bin;
-USE reibursements;
+CREATE DATABASE reimbursement CHARACTER SET utf8 COLLATE=utf8_bin;
+USE reimbursement;
 
 -- Create Tables
 
@@ -54,9 +54,26 @@ CREATE TABLE claims(
 CREATE TABLE receipts(
 	id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 	claimID INT UNSIGNED NOT NULL,
-	receiptID INT UNSIGNED NOT NULL,
+	typeID INT UNSIGNED NOT NULL,
 	amount DECIMAL(12,2) NOT NULL
 );
+
+-- Add foreign keys 
+
+ALTER TABLE users ADD CONSTRAINT role_fk FOREIGN KEY (roleID) 
+REFERENCES roles(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE claims ADD CONSTRAINT user_fk FOREIGN KEY (userID) 
+REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE receipts ADD CONSTRAINT receipts_claim_fk FOREIGN KEY (claimID) 
+REFERENCES claims(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE receipts ADD CONSTRAINT type_fk FOREIGN KEY (typeID) 
+REFERENCES types(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE mileages ADD CONSTRAINT mileages_claim_fk FOREIGN KEY (claimID) 
+REFERENCES claims(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- Fill tables
 
@@ -77,3 +94,7 @@ INSERT INTO limits VALUES
 INSERT INTO roles VALUES
 (NULL,'user'),
 (NULL,'admin');
+
+INSERT INTO users VALUES
+(NULL,1,"user","user"),
+(NULL,2,"admin","admin");

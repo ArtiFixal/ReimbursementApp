@@ -69,7 +69,7 @@ public class ClaimDAO extends DAOObject{
 		// Insert claim
 		try(PreparedStatement insert=con.prepareStatement("INSERT INTO claims VALUES(NULL,?,?,?,?)"))
 		{
-			insert.setInt(1,0);
+			insert.setInt(1,1);
 			insert.setDate(2,Date.valueOf(dateFrom));
 			insert.setDate(3,Date.valueOf(dateTo));
 			if(ignoredDays.isPresent())
