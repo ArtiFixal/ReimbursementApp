@@ -9,7 +9,6 @@ import artifixal.reimbursementcalculationapp.ReceiptType;
 import artifixal.reimbursementcalculationapp.daos.LimitDAO;
 import artifixal.reimbursementcalculationapp.daos.RatesDAO;
 import artifixal.reimbursementcalculationapp.daos.ReceiptTypeDAO;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -133,8 +132,12 @@ public class CalculateClaim extends ClaimServlet {
 				// If excluded days exists sum amount owed for them
 				if(excluded.isPresent())
 				{
-					int daysPassed=Period.getNumberOfDaysPassed(tripStart
-							,tripEnd)-excluded.get().getTotalNumberOfExcludedDays();
+					int daysPassed=Period.getNumberOfDaysPassed(tripStart,
+							tripEnd)-excluded.get()
+									.getTotalNumberOfExcludedDays();
+					// +1 to make possible claiming for the trip last day
+					if(daysPassed>0)
+						daysPassed++;
 					Rate allowanceRate=ratesDao.getAllowanceRate();
 					BigDecimal allowance=allowanceRate.getRate()
 							.multiply(BigDecimal.valueOf(daysPassed));
@@ -163,9 +166,11 @@ public class CalculateClaim extends ClaimServlet {
 						.getAmount();
 				try(PrintWriter w=new PrintWriter(response.getOutputStream())){
 					if(claimAmount.compareTo(totalClaimLimit)==1)
-						w.write(claimAmount.setScale(2,RoundingMode.FLOOR).toString());
+						w.write(totalClaimLimit.setScale(2,RoundingMode.FLOOR)
+								.toString());
 					else
-						w.write(totalClaimLimit.setScale(2,RoundingMode.FLOOR).toString());
+						w.write(claimAmount.setScale(2,RoundingMode.FLOOR)
+								.toString());
 					response.setStatus(HttpServletResponse.SC_OK);
 				}
 			}catch(SQLException e){

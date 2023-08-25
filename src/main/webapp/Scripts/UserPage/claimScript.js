@@ -269,8 +269,7 @@ function prepareData(){
 	if(document.getElementsByName("includeDailyAllowance")[0].checked)
 	{
 		const excludedDays=collectExcludedDays();
-		if(excludedDays!==null)
-			data.excluded=excludedDays;
+		data.excluded=excludedDays;
 	}
 	if(document.getElementsByName("includeCarMileage")[0].checked)
 	{

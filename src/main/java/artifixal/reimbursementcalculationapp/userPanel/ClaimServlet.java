@@ -26,8 +26,8 @@ import javax.servlet.http.HttpServletResponse;
  *	"dateTo": <i> trip end date </i><br>
  *	"receipts": <i> receipts declared by user </i> <b>*Optional* [{array of 
  * objects}]</b><br>
- *	"excluded": <i> days excluded from daily allowance </i> <b>*Optional* 
- * [{array of objects}]</b><br>
+ *	"excluded": <i> days excluded from daily allowance </i> <b>*Optional*
+ * [{array of objects}] *May be null*</b><br>
  *	"mileage": <i>distance for which personal car was used </i> <b>*Optional*</b><br>
  * }
  * 
@@ -122,7 +122,7 @@ public abstract class ClaimServlet extends HttpServlet{
 			}
 			Optional<ExcludedDays> excluded=Optional.empty();
 			// Get excluded days if they exists
-			if(excludedDaysNode!=null)
+			if(excludedDaysNode!=null&&!(excludedDaysNode instanceof NullNode))
 			{
 				try{
 					excluded=Optional.of(ExcludedDays.readFrom(excludedDaysNode,
@@ -138,6 +138,11 @@ public abstract class ClaimServlet extends HttpServlet{
 						"Malformed JSON request: Exclude days list is unreadable");
 					return;
 				}
+			}
+			// No days were excluded
+			else if(excludedDaysNode instanceof NullNode)
+			{
+				excluded=Optional.of(new ExcludedDays());
 			}
 			Optional<Integer> mileage=Optional.empty();
 			// Get mileage if it exists

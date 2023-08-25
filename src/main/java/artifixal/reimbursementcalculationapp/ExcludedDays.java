@@ -169,17 +169,20 @@ public class ExcludedDays {
 				excluded.addDay(current);
 				i++;
 			}
-			excluded.getDays().sort(createAscLocalDateComparator());
-			LocalDate previousDate=excluded.getDays().get(0);
-			for(int j=1;j<excluded.getDays().size();j++)
+			if(!excluded.getDays().isEmpty())
 			{
-				LocalDate current=excluded.getDays().get(j);
-				if(previousDate.equals(current))
-					throw new ExcludedDaysException("Duplicated days were found");
-				else if(Period.getNumberOfDaysPassed(current
-						,previousDate)==1)
-					throw new ExcludedDaysException("Days are increasing in order instead of being a period");
-				previousDate=current;
+				excluded.getDays().sort(createAscLocalDateComparator());
+				LocalDate previousDate=excluded.getDays().get(0);
+				for(int j=1;j<excluded.getDays().size();j++)
+				{
+					LocalDate current=excluded.getDays().get(j);
+					if(previousDate.equals(current))
+						throw new ExcludedDaysException("Duplicated days were found");
+					else if(Period.getNumberOfDaysPassed(current
+							,previousDate)==1)
+						throw new ExcludedDaysException("Days are increasing in order instead of being a period");
+					previousDate=current;
+				}
 			}
 		}
 		// Check for periods existence
