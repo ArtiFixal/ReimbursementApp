@@ -32,7 +32,7 @@ public class AddNewReceiptTest {
 			int exceptedResponseCode,String errorMsg) throws IOException
 	{
 		ServletTestUtils.sendRequestAndTestResponseCode(testServer.getURL(),"PUT",
-				json,ServletTestUtils.JSON_CONTENT,exceptedResponseCode,errorMsg);
+				ServletTestUtils.JSON_CONTENT,json,exceptedResponseCode,errorMsg);
 	}
 	
 	@Test
