@@ -2,7 +2,7 @@ package artifixal.reimbursementcalculationapp.adminPanel;
 
 import artifixal.reimbursementcalculationapp.DBConfig;
 import artifixal.reimbursementcalculationapp.MinimalServletServer;
-import artifixal.reimbursementcalculationapp.testUtils.ServletUtilis;
+import artifixal.reimbursementcalculationapp.testUtils.ServletTestUtils;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.sql.Connection;
@@ -31,8 +31,8 @@ public class AddNewReceiptTest {
 	private void sendRequestAndTestResponseCode(String json,
 			int exceptedResponseCode,String errorMsg) throws IOException
 	{
-		ServletUtilis.sendRequestAndTestResponseCode(testServer.getURL(),"PUT",
-				json,ServletUtilis.JSON_CONTENT,exceptedResponseCode,errorMsg);
+		ServletTestUtils.sendRequestAndTestResponseCode(testServer.getURL(),"PUT",
+				json,ServletTestUtils.JSON_CONTENT,exceptedResponseCode,errorMsg);
 	}
 	
 	@Test

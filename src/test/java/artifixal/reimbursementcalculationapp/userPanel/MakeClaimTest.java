@@ -1,7 +1,7 @@
 package artifixal.reimbursementcalculationapp.userPanel;
 
 import artifixal.reimbursementcalculationapp.MinimalServletServer;
-import artifixal.reimbursementcalculationapp.testUtils.ServletUtilis;
+import artifixal.reimbursementcalculationapp.testUtils.ServletTestUtils;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import org.junit.jupiter.api.AfterAll;
@@ -27,8 +27,8 @@ public class MakeClaimTest {
 	private void sendRequestAndTestResponseCode(String json,
 			int exceptedResponseCode,String errorMsg) throws IOException
 	{
-		ServletUtilis.sendRequestAndTestResponseCode(testServer.getURL(),"PUT",
-				ServletUtilis.JSON_CONTENT,json,exceptedResponseCode,errorMsg);
+		ServletTestUtils.sendRequestAndTestResponseCode(testServer.getURL(),"PUT",
+				ServletTestUtils.JSON_CONTENT,json,exceptedResponseCode,errorMsg);
 	}
 	
 	@Test

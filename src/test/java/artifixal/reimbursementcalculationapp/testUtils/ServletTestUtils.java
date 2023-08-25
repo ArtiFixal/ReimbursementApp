@@ -12,10 +12,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * 
  * @author ArtiFixal
  */
-public class ServletUtilis {
+public class ServletTestUtils {
 	public final static String JSON_CONTENT="application/json";
 	
-	private ServletUtilis(){
+	private ServletTestUtils(){
 		throw new AssertionError("Not instantiable");
 	}
 	
@@ -48,7 +48,7 @@ public class ServletUtilis {
 			int exceptedResponseCode,String errorMsg) throws IOException
 	{
 		HttpURLConnection con=
-				ServletUtilis.sendRequest(URL,method,contentType,json);
+				ServletTestUtils.sendRequest(URL,method,contentType,json);
 		int response=con.getResponseCode();
 		assertEquals(exceptedResponseCode,response,
 				errorMsg+". Code: "+response+" Message: "+con.getResponseMessage());
