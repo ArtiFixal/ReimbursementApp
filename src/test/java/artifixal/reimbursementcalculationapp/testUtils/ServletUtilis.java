@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Utility class containing usefull methods used to test servlets.
@@ -42,4 +43,14 @@ public class ServletUtilis {
 		}
 		return con;
 	}
+	
+	public static void sendRequestAndTestResponseCode(String URL,String method,String contentType,String json,
+			int exceptedResponseCode,String errorMsg) throws IOException
+	{
+		HttpURLConnection con=
+				ServletUtilis.sendRequest(URL,method,contentType,json);
+		int response=con.getResponseCode();
+		assertEquals(exceptedResponseCode,response,
+				errorMsg+". Code: "+response+" Message: "+con.getResponseMessage());
+	} 
 }
