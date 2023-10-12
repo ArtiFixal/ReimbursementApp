@@ -162,34 +162,15 @@ public class ReceiptTypeDAO extends DAOObject{
 	 * @return True if update was successful, false otherwise.
 	 * @throws SQLException Any error occurred during the DML query.
 	 */
-	public boolean updateReceipt(long id,Optional<String> newName,
-			Optional<BigDecimal> newLimit) throws SQLException
+	public boolean updateReceipt(long id,OptionalDBField<String> newName,
+			OptionalDBField<BigDecimal> newLimit) throws SQLException
 	{
-		StringBuilder sqlQuery=new StringBuilder("UPDATE types SET ");
-		if(newName.isPresent()&&newLimit.isPresent())
-			sqlQuery.append("name=?,`limit`=?");
-		else if(newName.isPresent())
-			sqlQuery.append("name=?");
-		else
-			sqlQuery.append("`limit`=?");
-		sqlQuery.append(" WHERE id=");
-		sqlQuery.append(id);
-		PreparedStatement update=con.prepareStatement(sqlQuery.toString());
-		if(newName.isPresent()&&newLimit.isPresent())
-		{
-			update.setString(1,newName.get());
-			update.setBigDecimal(2,newLimit.get());
+		try(PreparedStatement update=createUpdateStatement("types","id="+id,newName,newLimit)){
+			// Since we update by ID
+			return update.executeUpdate()==1;
 		}
-		else if(newName.isPresent())
-			update.setString(1,newName.get());
-		else
-			update.setBigDecimal(1,newLimit.get());
-		int result=update.executeUpdate();
-		update.close();
-		// Since we update by ID
-		return result==1;
 	}
-	
+
 	/**
 	 * Updates {@code ReceiptType} columns for given {@code ReceiptType} object
 	 * in DB. <p>
@@ -204,8 +185,8 @@ public class ReceiptTypeDAO extends DAOObject{
 	 * @return True if update was successful, false otherwise.
 	 * @throws SQLException Any error occurred during the DML query.
 	 */
-	public boolean updateReceipt(ReceiptType r,Optional<String> newName,
-			Optional<BigDecimal> newLimit) throws SQLException
+	public boolean updateReceipt(ReceiptType r,OptionalDBField<String> newName,
+			OptionalDBField<BigDecimal> newLimit) throws SQLException
 	{
 		return updateReceipt(r.getId(),newName,newLimit);
 	}
@@ -220,11 +201,7 @@ public class ReceiptTypeDAO extends DAOObject{
 	 */
 	public boolean deleteReceipt(long id) throws SQLException
 	{
-		Statement deletion=con.createStatement();
-		int result=deletion.executeUpdate("DELETE FROM types WHERE id="+id);
-		deletion.close();
-		// Since we delete by ID
-		return result==1;
+		return deleteByID("types",id);
 	}
 	
 	/**

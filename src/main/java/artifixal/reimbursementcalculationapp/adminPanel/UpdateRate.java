@@ -1,5 +1,6 @@
 package artifixal.reimbursementcalculationapp.adminPanel;
 
+import artifixal.reimbursementcalculationapp.daos.OptionalDBField;
 import artifixal.reimbursementcalculationapp.daos.RatesDAO;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -28,7 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet(name="UpdateRate", urlPatterns={"/updateRate"})
 public class UpdateRate extends HttpServlet {
 	
-	private Optional<BigDecimal> getOptionalValue(JsonNode json,
+	private OptionalDBField<BigDecimal> getOptionalValue(JsonNode json,
 			String key,String errorMsg,HttpServletResponse response) throws IOException
 	{
 		JsonNode fieldValue=json.get(key);
@@ -44,7 +45,7 @@ public class UpdateRate extends HttpServlet {
 				response.sendError(HttpServletResponse.SC_BAD_REQUEST,errorMsg);
 			}
 		}
-		return optionalField;
+		return new OptionalDBField(optionalField,key);
 	}
 	
 	/** 
@@ -69,10 +70,10 @@ public class UpdateRate extends HttpServlet {
 			// Check id validity
 			try{
 				int id=Integer.parseInt(idNode.asText());
-				Optional<BigDecimal> amount=getOptionalValue(jsonRequest,"amount",
+				OptionalDBField<BigDecimal> amount=getOptionalValue(jsonRequest,"amount",
 						"Malformed JSON request: Amount have to be a number",
 						response);
-				Optional<BigDecimal> limit=getOptionalValue(jsonRequest,"limit",
+				OptionalDBField<BigDecimal> limit=getOptionalValue(jsonRequest,"limit",
 						"Malformed JSON request: Limit have to be a number",
 						response);
 				// Send request to DB

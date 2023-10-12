@@ -1,5 +1,6 @@
 package artifixal.reimbursementcalculationapp.adminPanel;
 
+import artifixal.reimbursementcalculationapp.daos.OptionalDBField;
 import artifixal.reimbursementcalculationapp.daos.ReceiptTypeDAO;
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
@@ -49,8 +50,8 @@ public class UpdateReceipt extends HttpServlet {
 					JsonNode.class);
 			JsonNode idNode=requestJson.get("id");
 			// Get optional field to update
-			Optional<String> name=Optional.ofNullable(requestJson.get("name")
-					.asText(null));
+                        OptionalDBField<String> name=new OptionalDBField<>(Optional.ofNullable(requestJson.get("name")
+					.asText(null)),"name");
 			String limitString=requestJson.get("limit").asText();
 			// Check id existence
 			if(idNode!=null)
@@ -58,19 +59,20 @@ public class UpdateReceipt extends HttpServlet {
 				// Check id validity
 				try{
 					int id=Integer.parseUnsignedInt(idNode.asText());
-					Optional<BigDecimal> limit=Optional.empty();
+					Optional<BigDecimal> limitOptional=Optional.empty();
 					// Check limit existence
 					if(limitString!=null)
 					{
 						// Check limit validity
 						try{
-							limit=Optional.of(BigDecimal
+							limitOptional=Optional.of(BigDecimal
 									.valueOf(Float.parseFloat(limitString)));
 						}catch(NumberFormatException e){
 							response.sendError(HttpServletResponse.SC_BAD_REQUEST,
 							"Malformed JSON request: limit have to be a number");
 						}
 					}
+                                        OptionalDBField<BigDecimal> limit=new OptionalDBField<>(limitOptional,"limit");
 					// Send request to DB
 					try(ReceiptTypeDAO updateReceipt=new ReceiptTypeDAO()){
 						// Check if update was successful

@@ -3,10 +3,9 @@ package artifixal.reimbursementcalculationapp.daos;
 import artifixal.reimbursementcalculationapp.Rate;
 import java.math.BigDecimal;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Optional;
 
 /**
  * Class responsible for operations on <b>rates</b> DB table. <p>
@@ -52,14 +51,12 @@ public class RatesDAO extends DAOObject{
 	 */
 	public Rate getRate(int id) throws SQLException
 	{
-		try(Statement select=con.createStatement()){
-			ResultSet result=select.executeQuery("SELECT amount,`limit` FROM rates WHERE id="+id);
+		try(ResultSet result=getElementByID("amount,`limit`","rates",id)){
 			if(!result.isBeforeFirst())
 				return null;
 			result.next();
 			BigDecimal amount=result.getBigDecimal("amount");
 			BigDecimal limit=result.getBigDecimal("limit");
-			result.close();
 			return new Rate(id,amount,limit);
 		}
 	}
@@ -96,17 +93,11 @@ public class RatesDAO extends DAOObject{
 	 * @return True if update was successful, false otherwise.
 	 * @throws SQLException Any error occured during the DML query.
 	 */
-	public boolean updateRate(int id,Optional<BigDecimal> newRateAmount,
-			Optional<BigDecimal> newLimit) throws SQLException
+	public boolean updateRate(int id,OptionalDBField<BigDecimal> newRateAmount,
+			OptionalDBField<BigDecimal> newLimit) throws SQLException
 	{
-		try(Statement update=con.createStatement()){
-			StringBuilder sql=new StringBuilder("UPDATE rates SET ");
-			if(newRateAmount.isPresent())
-				sql.append("amount=").append(newRateAmount.get());
-			if(newLimit.isPresent())
-				sql.append("`limit`=").append(newLimit.get());
-			sql.append(" WHERE id=").append(id);
-			return update.executeUpdate(sql.toString())==1;
+            try(PreparedStatement update=createUpdateStatement("rates", "id="+id,newRateAmount,newLimit)){
+                    return update.executeUpdate()==1;
 		}
 	}
 }

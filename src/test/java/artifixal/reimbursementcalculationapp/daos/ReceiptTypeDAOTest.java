@@ -61,8 +61,8 @@ public class ReceiptTypeDAOTest {
 	@Order(2)
 	public void updateDataOnlyNameTest() throws SQLException
 	{
-		Optional<String> newName=Optional.of("test new name");
-		Optional<BigDecimal> unchanged=Optional.empty();
+		OptionalDBField<String> newName=new OptionalDBField<>(Optional.of("test new name"),"name");
+		OptionalDBField<BigDecimal> unchanged=new OptionalDBField<>(Optional.empty(),"limit");
 		assertTrue(dao.updateReceipt(lastInsertedReceiptID,newName,unchanged),
 				"Row to update not found.");
 	}
@@ -71,8 +71,8 @@ public class ReceiptTypeDAOTest {
 	@Order(3)
 	public void updateDataOnlyLimitTest() throws SQLException
 	{
-		Optional<String> unchanged=Optional.empty();
-		Optional<BigDecimal> newLimit=Optional.of(BigDecimal.valueOf(123));
+		OptionalDBField<String> unchanged=new OptionalDBField<>(Optional.empty(),"name");
+		OptionalDBField<BigDecimal> newLimit=new OptionalDBField<>(Optional.of(BigDecimal.valueOf(123)),"limit");
 		assertTrue(dao.updateReceipt(lastInsertedReceiptID,unchanged,newLimit),
 				"Row to update not found");
 	}
@@ -81,8 +81,8 @@ public class ReceiptTypeDAOTest {
 	@Order(4)
 	public void updateAllDataTest() throws SQLException
 	{
-		Optional<String> newName=Optional.of("test both name");
-		Optional<BigDecimal> newLimit=Optional.of(BigDecimal.valueOf(1234));
+		OptionalDBField<String> newName=new OptionalDBField<>(Optional.of("test both name"),"name");
+		OptionalDBField<BigDecimal> newLimit=new OptionalDBField<>(Optional.of(BigDecimal.valueOf(1234)),"limit");
 		assertTrue(dao.updateReceipt(lastInsertedReceiptID,newName,newLimit),
 				"Row to update not found");
 	}
