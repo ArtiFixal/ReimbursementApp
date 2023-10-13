@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author ArtiFixal
  */
 @WebServlet(name = "AddNewReceipt",urlPatterns = {"/addReceipt"})
-public class AddNewReceipt extends HttpServlet{
+public class AddNewReceiptType extends HttpServlet{
 	
 	/** 
      * Handles the HTTP <code>PUT</code> method.

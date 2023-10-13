@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author ArtiFixal
  */
 @WebServlet(name="UpdateReceipt", urlPatterns={"/updateReceipt"})
-public class UpdateReceipt extends HttpServlet {
+public class UpdateReceiptType extends HttpServlet {
 
 	/** 
      * Handles the HTTP <code>POST</code> method.

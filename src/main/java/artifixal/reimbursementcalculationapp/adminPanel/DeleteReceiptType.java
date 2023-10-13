@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author ArtiFixal
  */
 @WebServlet(name="DeleteReceipt", urlPatterns={"/deleteReceipt"})
-public class DeleteReceipt extends HttpServlet {
+public class DeleteReceiptType extends HttpServlet {
 	
 	/** 
      * Handles the HTTP <code>DELETE</code> method.

@@ -13,14 +13,14 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests related to {@link AddNewReceipt} {@code Servlet} functionality.
+ * Tests related to {@link AddNewReceiptType} {@code Servlet} functionality.
  * 
  * @author ArtiFixal
  */
-public class AddNewReceiptTest {
+public class AddNewReceiptTypeTest {
 	
 	private static final MinimalServletServer testServer=
-			new MinimalServletServer(AddNewReceipt.class);
+			new MinimalServletServer(AddNewReceiptType.class);
 	
 	@BeforeAll
 	public static void startServer() throws Exception
