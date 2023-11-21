@@ -59,6 +59,9 @@ public class DBConfig {
 			}catch(FileNotFoundException e){
 				// Create example config
 				synchronized(DB_CONFIG){
+					// Leave if already created by previous sync block enter
+                    if(DB_CONFIG.exists())
+                        return config;
 					String configBuilder="<dbURL>127.0.0.1:3306\n<dbName>reibursements\n<dbUser>root\n<dbPass>\n";
 					ConfigIO w=new ConfigIO(DB_CONFIG);
 					try{
